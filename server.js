@@ -328,7 +328,41 @@ io.on('connection', (socket) => {
 app.get('/room/:roomId', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+// 更新战绩
+app.post('/api/update-stats', authMiddleware, async (req, res) => {
+  try {
+    const { result } = req.body; // 'win' | 'loss' | 'draw'
+    const userId = req.user.userId;
 
+    if (result === 'win') {
+      await pool.query(
+        'UPDATE users SET wins = wins + 1, rating = rating + 25 WHERE id = $1',
+        [userId]
+      );
+    } else if (result === 'loss') {
+      await pool.query(
+        'UPDATE users SET losses = losses + 1, rating = GREATEST(0, rating - 15) WHERE id = $1',
+        [userId]
+      );
+    } else if (result === 'draw') {
+      await pool.query(
+        'UPDATE users SET draws = draws + 1, rating = rating + 5 WHERE id = $1',
+        [userId]
+      );
+    }
+
+    // 返回更新后的数据
+    const updated = await pool.query(
+      'SELECT rating, wins, losses, draws FROM users WHERE id = $1',
+      [userId]
+    );
+
+    res.json({ stats: updated.rows[0] });
+  } catch (err) {
+    console.error('更新战绩错误:', err);
+    res.status(500).json({ error: '服务器错误' });
+  }
+});
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });

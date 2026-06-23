@@ -898,26 +898,62 @@
         });
 
         socket.on('gameState', (gameState) => {
-          board = gameState.board.map(row => row.map(cell => {
-            if (cell === BLACK_STR) return BLACK;
-            if (cell === WHITE_STR) return WHITE;
-            return EMPTY;
-          }));
-          currentPlayer = gameState.currentPlayer === BLACK_STR ? BLACK : WHITE;
-          winner = gameState.winner ? (gameState.winner === BLACK_STR ? BLACK : WHITE) : null;
-          winningCells = gameState.winningCells || [];
-          moveCount = gameState.moveCount;
-          isDraw = gameState.isDraw;
-          
-          if (gameState.timers) {
-            blackTime = gameState.timers.black;
-            whiteTime = gameState.timers.white;
-          }
-          
-          isMyTurn = (currentPlayer === myColor);
-          updateUI();
-          drawBoard();
-        });
+  const prevWinner = winner;
+  
+  board = gameState.board.map(row => row.map(cell => {
+    if (cell === BLACK_STR) return BLACK;
+    if (cell === WHITE_STR) return WHITE;
+    return EMPTY;
+  }));
+  currentPlayer = gameState.currentPlayer === BLACK_STR ? BLACK : WHITE;
+  winner = gameState.winner ? (gameState.winner === BLACK_STR ? BLACK : WHITE) : null;
+  winningCells = gameState.winningCells || [];
+  moveCount = gameState.moveCount;
+  isDraw = gameState.isDraw;
+  
+  if (gameState.timers) {
+    blackTime = gameState.timers.black;
+    whiteTime = gameState.timers.white;
+  }
+  
+  isMyTurn = (currentPlayer === myColor);
+  updateUI();
+  drawBoard();
+  
+  // ========== 更新战绩（新增） ==========
+  if (myColor && (winner || isDraw) && !prevWinner && !gameState._statsUpdated) {
+    gameState._statsUpdated = true;
+    const token = localStorage.getItem('token');
+    if (token) {
+      let result = null;
+      if (winner === myColor) result = 'win';
+      else if (winner && winner !== myColor) result = 'loss';
+      else if (isDraw) result = 'draw';
+      
+      if (result) {
+        fetch('/api/update-stats', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ result: result })
+        })
+          .then(r => r.json())
+          .then(data => {
+            if (data.stats) {
+              document.getElementById('display-rating').textContent = data.stats.rating;
+              document.getElementById('display-wins').textContent = data.stats.wins;
+              document.getElementById('display-losses').textContent = data.stats.losses;
+              document.getElementById('display-draws').textContent = data.stats.draws;
+            }
+          })
+          .catch(err => console.error('更新战绩失败:', err));
+      }
+    }
+  }
+  // ========== 更新战绩结束 ==========
+});
 
         socket.on('timerUpdate', (timers) => {
           blackTime = timers.black;

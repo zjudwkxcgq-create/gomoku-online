@@ -1263,10 +1263,8 @@
         drawBoard();
         
         if (gameMode === MODE_AI && currentPlayer === aiColor && !winner && !isDraw) {
-          isAiThinking = true;
-          updateUI();
-          setTimeout(() => aiMove(), 50);
-        }
+  setTimeout(() => aiMove(), 50);
+}
       }
 
       function placeStone(row, col) {
@@ -1754,9 +1752,6 @@
               <div class="color-picker">
                 <div class="color-option black selected" data-color="1" title="执黑先行"></div>
                 <div class="color-option white" data-color="2" title="执白后手"></div>
-              </div>
-              <div class="ai-thinking" id="aiIndicator" style="display:none;">
-                <span>🤖 AI思考中...</span>
               </div>
             </div>
             

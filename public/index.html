@@ -107,9 +107,17 @@
     <button id="createRoomBtn">🏠 创建房间</button>
     <button id="matchmakingBtn">🎯 快速匹配</button>
   </div>
-  <div class="color-pick-row" id="aiSettings" style="display:none;">
+  <div id="aiSettings" style="display:none; width:100%;">
+  <div class="color-pick-row" style="margin-bottom:4px;">
     <span id="chooseColor">选择棋子：</span><div class="color-dot black-dot sel" data-color="1"></div><div class="color-dot white-dot" data-color="2"></div>
   </div>
+  <div style="display:flex;gap:4px;width:100%;">
+    <button class="mode-btn ai-diff active" data-diff="easy" style="font-size:0.7rem;padding:4px 0;">简单</button>
+    <button class="mode-btn ai-diff" data-diff="medium" style="font-size:0.7rem;padding:4px 0;">中等</button>
+    <button class="mode-btn ai-diff" data-diff="hard" style="font-size:0.7rem;padding:4px 0;">困难</button>
+    <button class="mode-btn ai-diff" data-diff="master" style="font-size:0.7rem;padding:4px 0;">大师</button>
+  </div>
+</div>
   <div class="room-id-text" id="roomInfo" style="display:none;"><span id="roomIdLabel">房间号：</span><span id="roomIdDisplay">------</span><span id="roomCopied">（已复制到剪贴板）</span></div>
   <div class="status-row"><span class="turn-text" id="turnText">⚫ 黑方回合</span><span class="move-text" id="moveCount">步数 0</span></div>
   <canvas id="boardCanvas"></canvas>
@@ -186,6 +194,10 @@ function t(key) {
     createRoom: { zh: '🏠 创建房间', en: '🏠 Create Room' },
     quickMatch: { zh: '🎯 快速匹配', en: '🎯 Quick Match' },
     chooseColor: { zh: '选择棋子：', en: 'Choose color: ' },
+easy: { zh: '简单', en: 'Easy' },
+medium: { zh: '中等', en: 'Medium' },
+hard: { zh: '困难', en: 'Hard' },
+master: { zh: '大师', en: 'Master' },
     roomId: { zh: '房间号：', en: 'Room: ' },
     copied: { zh: '（已复制到剪贴板）', en: ' (copied)' },
     newGame: { zh: '↺ 新的一局', en: '↺ New Game' },
@@ -253,6 +265,8 @@ function updateAllTexts() {
   document.getElementById('reg-email').placeholder = t('email');
   document.getElementById('reg-password').placeholder = t('password');
   document.getElementById('reg-confirm').placeholder = t('confirmPassword');
+  var diffs = document.querySelectorAll('.ai-diff');
+  if (diffs.length) { diffs[0].textContent = t('easy'); diffs[1].textContent = t('medium'); diffs[2].textContent = t('hard'); diffs[3].textContent = t('master'); }
 }
 updateAllTexts();
 
@@ -394,10 +408,219 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 
   // AI (unchanged)
-  function getNearbyEmptyCells(radius=2){const set=new Set();for(let r=0;r<BOARD_SIZE;r++)for(let c=0;c<BOARD_SIZE;c++)if(board[r][c]!==EMPTY)for(let dr=-radius;dr<=radius;dr++)for(let dc=-radius;dc<=radius;dc++){const nr=r+dr,nc=c+dc;if(nr>=0&&nr<BOARD_SIZE&&nc>=0&&nc<BOARD_SIZE&&board[nr][nc]===EMPTY)set.add(`${nr},${nc}`);}return set.size?Array.from(set).map(s=>s.split(',').map(Number)):[[7,7]];}
-  function evaluatePosition(row,col,player){let score=0;board[row][col]=player;const dirs=[[1,0],[0,1],[1,1],[1,-1]];for(let[dx,dy]of dirs){let count=1,openEnds=0,r=row+dx,c=col+dy;while(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===player){count++;r+=dx;c+=dy;}if(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===EMPTY)openEnds++;r=row-dx;c=col-dy;while(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===player){count++;r-=dx;c-=dy;}if(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===EMPTY)openEnds++;if(count>=5)score+=100000;else if(count===4)score+=openEnds===2?10000:openEnds===1?3000:0;else if(count===3)score+=openEnds===2?2000:openEnds===1?800:0;else if(count===2)score+=openEnds===2?400:openEnds===1?100:0;else if(count===1)score+=10;}board[row][col]=EMPTY;return score;}
-  function evaluateDefense(row,col,player){const opp=player===BLACK?WHITE:BLACK;let score=0;board[row][col]=opp;const dirs=[[1,0],[0,1],[1,1],[1,-1]];for(let[dx,dy]of dirs){let count=1,openEnds=0,r=row+dx,c=col+dy;while(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===opp){count++;r+=dx;c+=dy;}if(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===EMPTY)openEnds++;r=row-dx;c=col-dy;while(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===opp){count++;r-=dx;c-=dy;}if(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===EMPTY)openEnds++;if(count>=5)score+=80000;else if(count===4&&openEnds>=1)score+=8000;else if(count===3&&openEnds===2)score+=1500;}board[row][col]=EMPTY;return score;}
-  function aiMove(){if(winner||isDraw){isAiThinking=false;updateUI();return;}const candidates=getNearbyEmptyCells(2);let bestScore=-Infinity,bestMoves=[];for(let[r,c]of candidates){let score=evaluatePosition(r,c,aiColor)*1.2+evaluateDefense(r,c,aiColor)*1.1+evaluatePosition(r,c,aiColor===BLACK?WHITE:BLACK)*0.3+(14-Math.abs(r-7)-Math.abs(c-7))*5;if(score>bestScore){bestScore=score;bestMoves=[[r,c]];}else if(score===bestScore)bestMoves.push([r,c]);}isAiThinking=false;if(bestMoves.length)placeStoneLocal(bestMoves[0][0],bestMoves[0][1]);}
+    // ==================== AI (难度分级) ====================
+  let aiDifficulty = 'easy'; // easy | medium | hard | master
+
+  function getNearbyEmptyCells(radius=2){
+    const set=new Set();
+    for(let r=0;r<BOARD_SIZE;r++)for(let c=0;c<BOARD_SIZE;c++)if(board[r][c]!==EMPTY)
+      for(let dr=-radius;dr<=radius;dr++)for(let dc=-radius;dc<=radius;dc++){
+        const nr=r+dr,nc=c+dc;
+        if(nr>=0&&nr<BOARD_SIZE&&nc>=0&&nc<BOARD_SIZE&&board[nr][nc]===EMPTY)set.add(`${nr},${nc}`);
+      }
+    return set.size?Array.from(set).map(s=>s.split(',').map(Number)):[[7,7]];
+  }
+
+  function getAllEmptyCells(){
+    const cells=[];
+    for(let r=0;r<BOARD_SIZE;r++)for(let c=0;c<BOARD_SIZE;c++)if(board[r][c]===EMPTY)cells.push([r,c]);
+    return cells;
+  }
+
+  function evaluatePosition(row,col,player){
+    let score=0;board[row][col]=player;
+    const dirs=[[1,0],[0,1],[1,1],[1,-1]];
+    for(let[dx,dy]of dirs){
+      let count=1,openEnds=0,r=row+dx,c=col+dy;
+      while(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===player){count++;r+=dx;c+=dy;}
+      if(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===EMPTY)openEnds++;
+      r=row-dx;c=col-dy;
+      while(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===player){count++;r-=dx;c-=dy;}
+      if(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===EMPTY)openEnds++;
+      if(count>=5)score+=100000;
+      else if(count===4)score+=openEnds===2?10000:openEnds===1?3000:0;
+      else if(count===3)score+=openEnds===2?2000:openEnds===1?800:0;
+      else if(count===2)score+=openEnds===2?400:openEnds===1?100:0;
+      else if(count===1)score+=openEnds===1?10:2;
+    }
+    board[row][col]=EMPTY;return score;
+  }
+
+  function evaluateDefense(row,col,player){
+    const opp=player===BLACK?WHITE:BLACK;let score=0;board[row][col]=opp;
+    const dirs=[[1,0],[0,1],[1,1],[1,-1]];
+    for(let[dx,dy]of dirs){
+      let count=1,openEnds=0,r=row+dx,c=col+dy;
+      while(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===opp){count++;r+=dx;c+=dy;}
+      if(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===EMPTY)openEnds++;
+      r=row-dx;c=col-dy;
+      while(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===opp){count++;r-=dx;c-=dy;}
+      if(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===EMPTY)openEnds++;
+      if(count>=5)score+=80000;
+      else if(count===4&&openEnds>=1)score+=8000;
+      else if(count===3&&openEnds===2)score+=1500;
+    }
+    board[row][col]=EMPTY;return score;
+  }
+
+  function evaluateBoard(player){
+    let score=0;
+    for(let r=0;r<BOARD_SIZE;r++)for(let c=0;c<BOARD_SIZE;c++){
+      if(board[r][c]===player)score+=evaluatePosition(r,c,player);
+      else if(board[r][c]===(player===BLACK?WHITE:BLACK))score-=evaluatePosition(r,c,player===BLACK?WHITE:BLACK)*0.9;
+    }
+    return score;
+  }
+
+ // 简单AI：会基本评估但偶尔随机
+function aiMoveEasy(){
+  const candidates = getNearbyEmptyCells(2);
+  if (candidates.length === 0) {
+    const empties = getAllEmptyCells();
+    if (empties.length) {
+      const m = empties[Math.floor(Math.random() * empties.length)];
+      placeStoneLocal(m[0], m[1]);
+    }
+    return;
+  }
+
+  // 先检查是否能直接赢
+  for (let [r, c] of candidates) {
+    board[r][c] = aiColor;
+    if (checkWin(r, c, aiColor)) {
+      board[r][c] = EMPTY;
+      placeStoneLocal(r, c);
+      return;
+    }
+    board[r][c] = EMPTY;
+  }
+
+  // 检查是否需要堵对手的活四/活三
+  const opp = aiColor === BLACK ? WHITE : BLACK;
+  let mustBlock = null;
+  for (let [r, c] of candidates) {
+    board[r][c] = opp;
+    if (checkWin(r, c, opp)) {
+      board[r][c] = EMPTY;
+      mustBlock = [r, c];
+      break;
+    }
+    board[r][c] = EMPTY;
+  }
+
+  // 30%概率随机走（放水），70%概率走正常评估
+  if (Math.random() < 0.3 && !mustBlock) {
+    const m = candidates[Math.floor(Math.random() * candidates.length)];
+    placeStoneLocal(m[0], m[1]);
+    return;
+  }
+
+  if (mustBlock) {
+    placeStoneLocal(mustBlock[0], mustBlock[1]);
+    return;
+  }
+
+  // 正常评估走一步
+  let bestScore = -Infinity, bestMoves = [];
+  for (let [r, c] of candidates) {
+    let score = evaluatePosition(r, c, aiColor) * 1.2 + evaluateDefense(r, c, aiColor) * 1.1 + (14 - Math.abs(r-7) - Math.abs(c-7)) * 5;
+    if (score > bestScore) { bestScore = score; bestMoves = [[r, c]]; }
+    else if (score === bestScore) bestMoves.push([r, c]);
+  }
+  const m = bestMoves[Math.floor(Math.random() * bestMoves.length)];
+  placeStoneLocal(m[0], m[1]);
+}
+  }
+
+  // 中等AI：贪心一步
+  function aiMoveMedium(){
+    const candidates=getNearbyEmptyCells(2);
+    let bestScore=-Infinity,bestMoves=[];
+    for(let[r,c]of candidates){
+      let score=evaluatePosition(r,c,aiColor)*1.2+evaluateDefense(r,c,aiColor)*1.1+evaluatePosition(r,c,aiColor===BLACK?WHITE:BLACK)*0.3+(14-Math.abs(r-7)-Math.abs(c-7))*5;
+      if(score>bestScore){bestScore=score;bestMoves=[[r,c]];}
+      else if(score===bestScore)bestMoves.push([r,c]);
+    }
+    if(bestMoves.length)placeStoneLocal(bestMoves[0][0],bestMoves[0][1]);
+  }
+
+  // 困难AI：minmax 深度2
+  function aiMoveHard(){
+    const candidates=getNearbyEmptyCells(2);
+    if(candidates.length===0){aiMoveMedium();return;}
+    let bestScore=-Infinity,bestMove=candidates[0];
+    for(let[r,c]of candidates){
+      board[r][c]=aiColor;
+      let score=minimax(2,false,-Infinity,Infinity,aiColor);
+      board[r][c]=EMPTY;
+      if(score>bestScore){bestScore=score;bestMove=[r,c];}
+    }
+    placeStoneLocal(bestMove[0],bestMove[1]);
+  }
+
+  // 大师AI：minmax 深度4
+  function aiMoveMaster(){
+    const candidates=getNearbyEmptyCells(2);
+    if(candidates.length===0){aiMoveMedium();return;}
+    let bestScore=-Infinity,bestMove=candidates[0];
+    for(let[r,c]of candidates){
+      board[r][c]=aiColor;
+      let score=minimax(4,false,-Infinity,Infinity,aiColor);
+      board[r][c]=EMPTY;
+      if(score>bestScore){bestScore=score;bestMove=[r,c];}
+    }
+    placeStoneLocal(bestMove[0],bestMove[1]);
+  }
+
+  function minimax(depth,isMax,alpha,beta,player){
+    // 检测终局
+    for(let r=0;r<BOARD_SIZE;r++)for(let c=0;c<BOARD_SIZE;c++){
+      if(board[r][c]===player&&checkWin(r,c,player))return 100000+depth;
+      if(board[r][c]===(player===BLACK?WHITE:BLACK)&&checkWin(r,c,player===BLACK?WHITE:BLACK))return -100000-depth;
+    }
+    if(depth===0||isBoardFull())return evaluateBoard(player);
+
+    const opp=player===BLACK?WHITE:BLACK;
+    const candidates=getNearbyEmptyCells(1);
+    if(candidates.length===0)return evaluateBoard(player);
+
+    if(isMax){
+      let maxVal=-Infinity;
+      for(let[r,c]of candidates){
+        board[r][c]=player;
+        let val=minimax(depth-1,false,alpha,beta,player);
+        board[r][c]=EMPTY;
+        maxVal=Math.max(maxVal,val);
+        alpha=Math.max(alpha,val);
+        if(beta<=alpha)break;
+      }
+      return maxVal;
+    }else{
+      let minVal=Infinity;
+      for(let[r,c]of candidates){
+        board[r][c]=opp;
+        let val=minimax(depth-1,true,alpha,beta,player);
+        board[r][c]=EMPTY;
+        minVal=Math.min(minVal,val);
+        beta=Math.min(beta,val);
+        if(beta<=alpha)break;
+      }
+      return minVal;
+    }
+  }
+
+  function aiMove(){
+    if(winner||isDraw){isAiThinking=false;updateUI();return;}
+    isAiThinking=false;
+    switch(aiDifficulty){
+      case 'easy': aiMoveEasy(); break;
+      case 'medium': aiMoveMedium(); break;
+      case 'hard': aiMoveHard(); break;
+      case 'master': aiMoveMaster(); break;
+      default: aiMoveMedium();
+    }
+  }
+  // ==================== AI 结束 ====================
 
   function resetGame(){if(gameMode===MODE_ONLINE&&currentRoomId&&socket){socket.emit('leaveRoom',{roomId:currentRoomId});currentRoomId=null;myColor=null;}stopTimer();board=Array(BOARD_SIZE).fill().map(()=>Array(BOARD_SIZE).fill(EMPTY));currentPlayer=BLACK;winner=null;winningCells=[];historyStack=[];moveCount=0;isDraw=false;blackTime=INITIAL_TIME;whiteTime=INITIAL_TIME;timerActive=false;hoverRow=-1;hoverCol=-1;isMyTurn=true;isAiThinking=false;animatingStone=null;document.getElementById('roomInfo').style.display='none';updateModeButtons();updateUI();drawBoard();if(gameMode===MODE_AI&&aiColor===BLACK)setTimeout(()=>aiMove(),300);}
   function undoMove(){if(isAiThinking)return;if(gameMode===MODE_ONLINE&&currentRoomId&&socket){socket.emit('requestUndo',{roomId:currentRoomId});showNotification(t('undoSent'));}else if(gameMode===MODE_AI&&historyStack.length>=2&&!winner&&!isDraw){for(let i=0;i<2;i++){const last=historyStack.pop();board=last.board.map(r=>[...r]);currentPlayer=last.player;moveCount=last.moveCount;}updateUI();drawBoard();}else if(gameMode===MODE_PVP&&historyStack.length>0&&!winner&&!isDraw){const last=historyStack.pop();board=last.board.map(r=>[...r]);currentPlayer=last.player;moveCount=last.moveCount;updateUI();drawBoard();}}
@@ -446,6 +669,11 @@ window.addEventListener('DOMContentLoaded', function() {
   CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){if(w<2*r)r=w/2;if(h<2*r)r=h/2;this.moveTo(x+r,y);this.lineTo(x+w-r,y);this.quadraticCurveTo(x+w,y,x+w,y+r);this.lineTo(x+w,y+h-r);this.quadraticCurveTo(x+w,y+h,x+w-r,y+h);this.lineTo(x+r,y+h);this.quadraticCurveTo(x,y+h,x,y+h-r);this.lineTo(x,y+r);this.quadraticCurveTo(x,y,x+r,y);this.closePath();return this;};
   document.querySelectorAll('.mode-btn').forEach(b=>b.addEventListener('click',()=>switchMode(b.dataset.mode)));
   document.querySelectorAll('.color-dot').forEach(o=>o.addEventListener('click',()=>setPlayerColor(parseInt(o.dataset.color))));
+document.querySelectorAll('.ai-diff').forEach(b=>b.addEventListener('click',function(){
+  aiDifficulty=this.dataset.diff;
+  document.querySelectorAll('.ai-diff').forEach(x=>x.classList.remove('active'));
+  this.classList.add('active');
+}));
   document.getElementById('createRoomBtn').addEventListener('click',createPrivateRoom);
   document.getElementById('matchmakingBtn').addEventListener('click',()=>{joinMatchmaking();document.getElementById('matchmakingBtn').style.display='none';});
   document.getElementById('resetBtn').addEventListener('click',resetGame);

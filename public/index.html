@@ -3,43 +3,108 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=1.5">
-  <title>暗黑五子棋 · 科技棋院</title>
+  <title>五子棋在线 - 免费五子棋游戏</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
-      background: #0a0e17;
+      background: #f5f0e8;
       min-height: 100vh;
+      color: #333;
+    }
+
+    /* ===== 顶部导航栏 ===== */
+    .navbar {
+      background: #fff;
+      border-bottom: 1px solid #e0d8cc;
+      padding: 0 24px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      padding: 12px;
+      justify-content: space-between;
+      height: 52px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .nav-logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #8B6914;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nav-logo::before {
+      content: '⬡';
+      font-size: 1.3rem;
+    }
+    .nav-links {
+      display: flex;
+      gap: 4px;
+      list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: #666;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .nav-links a:hover { background: #f5f0e8; color: #333; }
+    .nav-links a.active { background: #f5f0e8; color: #8B6914; font-weight: 600; }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-right .user-btn {
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid #d0c8b8;
+      background: #fff;
+      color: #666;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    .nav-right .user-btn:hover { background: #f5f0e8; }
+    .nav-right .user-btn.primary {
+      background: #8B6914;
+      color: #fff;
+      border-color: #8B6914;
+    }
+    .nav-right .user-btn.primary:hover { background: #6b4f0e; }
 
     /* ===== 主容器 ===== */
     .main-container {
-      width: 100%;
-      max-width: 620px;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 16px 12px 40px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 10px;
     }
 
-    /* ===== 顶部信息栏 ===== */
+    /* ===== 顶部玩家信息 ===== */
     .top-bar {
       width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
-
-    /* 玩家信息卡片 */
     .player-card {
-      background: #1a1f2e;
-      border: 1px solid #2a3040;
+      background: #fff;
+      border: 1px solid #e0d8cc;
       border-radius: 10px;
       padding: 10px 14px;
       display: flex;
@@ -47,11 +112,10 @@
       gap: 10px;
       min-width: 0;
       flex: 1;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
-
     .player-avatar {
-      width: 38px;
-      height: 38px;
+      width: 36px; height: 36px;
       border-radius: 50%;
       flex-shrink: 0;
     }
@@ -61,43 +125,30 @@
     }
     .player-avatar.white-av {
       background: radial-gradient(circle at 35% 35%, #fff, #ccc);
-      border: 2px solid #999;
-    }
-
-    .player-info {
-      min-width: 0;
+      border: 2px solid #ccc;
     }
     .player-name {
       font-size: 0.85rem;
-      color: #e2e8f0;
+      color: #333;
       font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
     .player-rating {
       font-size: 0.7rem;
-      color: #64748b;
+      color: #999;
     }
-
-    /* 中间计时器 */
     .timer-center {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-      min-width: 70px;
+      text-align: center;
+      min-width: 60px;
     }
     .timer-center .vs-text {
       font-size: 0.65rem;
-      color: #475569;
-      text-transform: uppercase;
+      color: #bbb;
       letter-spacing: 1px;
     }
     .timer-center .clock {
       font-family: 'Fira Code', monospace;
-      font-size: 0.95rem;
-      color: #38bdf8;
+      font-size: 1rem;
+      color: #8B6914;
       font-weight: 600;
     }
 
@@ -111,183 +162,155 @@
       flex: 1;
       padding: 7px 0;
       border-radius: 6px;
-      border: 1px solid #2a3040;
-      background: #1a1f2e;
-      color: #64748b;
+      border: 1px solid #d0c8b8;
+      background: #fff;
+      color: #888;
       cursor: pointer;
       font-size: 0.75rem;
       font-weight: 600;
       text-align: center;
-      transition: all 0.15s;
     }
-    .mode-btn:hover { color: #94a3b8; border-color: #475569; }
+    .mode-btn:hover { border-color: #8B6914; color: #8B6914; }
     .mode-btn.active {
-      background: #38bdf8;
-      color: #0a0e17;
-      border-color: #38bdf8;
+      background: #8B6914;
+      color: #fff;
+      border-color: #8B6914;
     }
 
-    /* 在线控制 */
     .online-row {
-      display: flex;
-      gap: 6px;
-      width: 100%;
+      display: flex; gap: 6px; width: 100%;
     }
     .online-row button {
-      flex: 1;
-      padding: 6px 0;
-      border-radius: 6px;
-      border: 1px solid #38bdf8;
-      background: transparent;
-      color: #38bdf8;
-      cursor: pointer;
-      font-size: 0.75rem;
-      font-weight: 600;
+      flex: 1; padding: 6px 0; border-radius: 6px;
+      border: 1px solid #8B6914; background: #fff;
+      color: #8B6914; cursor: pointer; font-size: 0.75rem; font-weight: 600;
     }
-    .online-row button:hover { background: #38bdf8; color: #0a0e17; }
+    .online-row button:hover { background: #8B6914; color: #fff; }
 
     .room-id-text {
-      width: 100%;
-      text-align: center;
-      font-size: 0.75rem;
-      color: #475569;
+      font-size: 0.75rem; color: #999; text-align: center;
     }
-    .room-id-text span { color: #38bdf8; font-family: 'Fira Code', monospace; }
+    .room-id-text span { color: #8B6914; font-family: 'Fira Code', monospace; }
 
-    /* ===== 状态栏 ===== */
+    /* ===== 状态行 ===== */
     .status-row {
       width: 100%;
       display: flex;
       justify-content: space-between;
-      align-items: center;
       font-size: 0.8rem;
     }
-    .turn-text {
-      color: #e2e8f0;
-      font-weight: 600;
-    }
-    .move-text {
-      color: #64748b;
-    }
+    .turn-text { color: #333; font-weight: 600; }
+    .move-text { color: #999; }
 
     /* ===== 棋盘 ===== */
-    .board-wrap {
-      position: relative;
-    }
     canvas {
       display: block;
-      border-radius: 12px;
+      border-radius: 10px;
       cursor: pointer;
       max-width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     }
 
-    /* ===== 操作按钮 ===== */
+    /* ===== 按钮 ===== */
     .action-row {
-      display: flex;
-      gap: 8px;
-      width: 100%;
+      display: flex; gap: 8px; width: 100%;
     }
     .btn {
-      flex: 1;
-      padding: 8px 0;
-      border-radius: 8px;
-      border: 1px solid #2a3040;
-      background: #1a1f2e;
-      color: #94a3b8;
-      cursor: pointer;
-      font-size: 0.8rem;
-      font-weight: 600;
-      text-align: center;
-      transition: all 0.15s;
+      flex: 1; padding: 8px 0; border-radius: 8px;
+      border: 1px solid #d0c8b8; background: #fff;
+      color: #666; cursor: pointer; font-size: 0.8rem; font-weight: 600;
     }
-    .btn:hover { background: #252d3a; color: #e2e8f0; }
+    .btn:hover { background: #f5f0e8; color: #333; }
 
-    /* ===== 登录框 ===== */
+    /* ===== 登录弹窗 ===== */
     .auth-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); display: flex; align-items: center;
+      justify-content: center; z-index: 999;
     }
     .auth-card {
-      background: #1a1f2e;
-      border: 1px solid #2a3040;
-      border-radius: 14px;
-      padding: 24px;
-      width: 90%;
-      max-width: 340px;
-      color: #e2e8f0;
+      background: #fff; border-radius: 14px; padding: 28px;
+      width: 90%; max-width: 340px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     }
-    .auth-card h3 { color: #38bdf8; margin-bottom: 12px; font-size: 0.95rem; }
+    .auth-card h3 { color: #8B6914; margin-bottom: 12px; font-size: 0.95rem; }
     .auth-card input {
-      width: 100%; padding: 8px; margin: 4px 0;
-      border-radius: 6px; border: 1px solid #2a3040;
-      background: #0f131c; color: #e2e8f0; font-size: 0.8rem;
+      width: 100%; padding: 9px; margin: 4px 0;
+      border-radius: 6px; border: 1px solid #d0c8b8;
+      background: #faf7f0; font-size: 0.85rem;
     }
     .auth-card button {
-      width: 100%; padding: 8px; margin-top: 8px;
-      background: #38bdf8; color: #0a0e17;
+      width: 100%; padding: 9px; margin-top: 8px;
+      background: #8B6914; color: #fff;
       border: none; border-radius: 6px; cursor: pointer;
       font-weight: bold; font-size: 0.85rem;
     }
     .auth-tabs { display: flex; gap: 4px; margin-bottom: 10px; }
     .auth-tab {
-      flex: 1; padding: 6px; background: #0f131c; border: 1px solid #2a3040;
-      border-radius: 6px; color: #64748b; cursor: pointer; font-size: 0.75rem; text-align: center;
+      flex: 1; padding: 6px; background: #f5f0e8;
+      border: 1px solid #d0c8b8; border-radius: 6px;
+      color: #888; cursor: pointer; font-size: 0.75rem; text-align: center;
     }
-    .auth-tab.active { background: #38bdf8; color: #0a0e17; border-color: #38bdf8; }
-
-    /* 用户条 */
-    .user-strip {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #1a1f2e;
-      border: 1px solid #2a3040;
-      border-radius: 8px;
-      padding: 8px 12px;
-      font-size: 0.75rem;
-    }
-    .user-strip .usr-name { color: #e2e8f0; font-weight: 600; }
-    .user-strip .usr-rating { color: #fbbf24; }
-    .user-strip .usr-stats { color: #64748b; }
-    .user-strip button {
-      padding: 4px 10px; border-radius: 5px; border: 1px solid #475569;
-      background: transparent; color: #94a3b8; cursor: pointer; font-size: 0.7rem;
-    }
-
-    /* 通知 */
-    .notification {
-      position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
-      background: #1a1f2e; border: 1px solid #38bdf8; padding: 8px 18px;
-      border-radius: 8px; color: #e2e8f0; z-index: 1000; font-size: 0.8rem;
-    }
+    .auth-tab.active { background: #8B6914; color: #fff; border-color: #8B6914; }
 
     /* 颜色选择 */
     .color-pick-row {
-      display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: #64748b;
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.7rem; color: #999; justify-content: center;
     }
     .color-dot {
-      width: 20px; height: 20px; border-radius: 50%; cursor: pointer; border: 2px solid transparent;
+      width: 20px; height: 20px; border-radius: 50%; cursor: pointer;
+      border: 2px solid transparent;
     }
     .color-dot.black-dot { background: radial-gradient(circle at 35% 35%, #555, #111); }
     .color-dot.white-dot { background: radial-gradient(circle at 35% 35%, #fff, #ccc); }
-    .color-dot.sel { border-color: #38bdf8; }
+    .color-dot.sel { border-color: #8B6914; }
+
+    /* 通知 */
+    .notification {
+      position: fixed; top: 64px; left: 50%; transform: translateX(-50%);
+      background: #fff; border: 1px solid #8B6914; padding: 8px 20px;
+      border-radius: 8px; color: #333; z-index: 1000; font-size: 0.8rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+
+    /* 移动端导航 */
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .navbar { padding: 0 12px; }
+    }
   </style>
 </head>
 <body>
 
+<!-- ===== 顶部导航栏 ===== -->
+<nav class="navbar">
+  <div class="nav-left">
+    <a href="/" class="nav-logo">五子棋在线</a>
+    <ul class="nav-links">
+      <li><a href="/" class="active">开始游戏</a></li>
+      <li><a href="#" onclick="alert('排行榜功能即将上线！')">排行榜</a></li>
+      <li><a href="#" onclick="alert('游戏规则：五子连珠即获胜，黑棋先行。')">游戏规则</a></li>
+      <li><a href="#" onclick="alert('五子棋在线 - 免费在线五子棋对弈平台')">关于</a></li>
+    </ul>
+  </div>
+  <div class="nav-right" id="navRight">
+    <button class="user-btn" onclick="showAuth()">登录</button>
+    <button class="user-btn primary" onclick="showAuth(); switchAuthTab('register')">注册</button>
+  </div>
+  <div class="nav-right" id="navRightLogged" style="display:none;">
+    <span style="font-size:0.8rem;color:#666;margin-right:6px;" id="navUserName"></span>
+    <button class="user-btn" onclick="handleLogout()">退出</button>
+  </div>
+</nav>
+
+<!-- ===== 主内容 ===== -->
 <div class="main-container">
 
-  <!-- ===== 顶部：玩家信息 ===== -->
+  <!-- 玩家信息 -->
   <div class="top-bar">
     <div class="player-card">
       <div class="player-avatar black-av"></div>
-      <div class="player-info">
+      <div>
         <div class="player-name" id="blackName">⚫ 黑方</div>
         <div class="player-rating" id="blackInfo">先手</div>
       </div>
@@ -298,62 +321,45 @@
     </div>
     <div class="player-card">
       <div class="player-avatar white-av"></div>
-      <div class="player-info">
+      <div>
         <div class="player-name" id="whiteName">⚪ 白方</div>
         <div class="player-rating" id="whiteInfo">后手</div>
       </div>
     </div>
   </div>
 
-  <!-- ===== 用户状态条 ===== -->
-  <div class="user-strip" id="userStrip">
-    <span style="color:#64748b;">未登录</span>
-    <button onclick="showAuth()">登录 / 注册</button>
-  </div>
-  <div class="user-strip" id="userStripLogged" style="display:none;">
-    <span class="usr-name" id="usrName"></span>
-    <span class="usr-rating" id="usrRating">1000</span>
-    <span class="usr-stats"><span id="usrW">0</span>胜/<span id="usrL">0</span>负/<span id="usrD">0</span>平</span>
-    <button onclick="handleLogout()">退出</button>
-  </div>
-
-  <!-- ===== 模式切换 ===== -->
+  <!-- 模式 -->
   <div class="mode-row">
     <button class="mode-btn active" data-mode="pvp">👥 本地双人</button>
     <button class="mode-btn" data-mode="ai">🤖 AI对战</button>
     <button class="mode-btn" data-mode="online">🌐 在线联机</button>
   </div>
 
-  <!-- 在线控制 -->
   <div class="online-row" id="onlineControls" style="display:none;">
     <button id="createRoomBtn">🏠 创建房间</button>
     <button id="matchmakingBtn">🎯 快速匹配</button>
   </div>
 
-  <!-- AI设置 -->
-  <div class="color-pick-row" id="aiSettings" style="display:none; justify-content:center;">
+  <div class="color-pick-row" id="aiSettings" style="display:none;">
     选择棋子：
     <div class="color-dot black-dot sel" data-color="1"></div>
     <div class="color-dot white-dot" data-color="2"></div>
   </div>
 
-  <!-- 房间号 -->
   <div class="room-id-text" id="roomInfo" style="display:none;">
-    房间号：<span id="roomIdDisplay">------</span>（点击复制）
+    房间号：<span id="roomIdDisplay">------</span>（已复制到剪贴板）
   </div>
 
-  <!-- ===== 状态行 ===== -->
+  <!-- 状态 -->
   <div class="status-row">
     <span class="turn-text" id="turnText">⚫ 黑方回合</span>
     <span class="move-text" id="moveCount">步数 0</span>
   </div>
 
-  <!-- ===== 棋盘 ===== -->
-  <div class="board-wrap">
-    <canvas id="boardCanvas"></canvas>
-  </div>
+  <!-- 棋盘 -->
+  <canvas id="boardCanvas"></canvas>
 
-  <!-- ===== 操作按钮 ===== -->
+  <!-- 按钮 -->
   <div class="action-row">
     <button class="btn" id="resetBtn">↺ 新的一局</button>
     <button class="btn" id="undoBtn">↩ 悔棋</button>
@@ -384,7 +390,7 @@
         <button onclick="handleRegister()">注册</button>
       </div>
     </div>
-    <button style="background:#2a3040;color:#94a3b8;margin-top:8px;" onclick="hideAuth()">关闭</button>
+    <button style="width:100%;padding:8px;margin-top:8px;background:#f5f0e8;border:1px solid #d0c8b8;border-radius:6px;color:#888;cursor:pointer;font-size:0.8rem;" onclick="hideAuth()">关闭</button>
   </div>
 </div>
 
@@ -444,18 +450,14 @@ async function handleRegister() {
 function handleLogout() { localStorage.clear(); showLoggedOut(); }
 
 function showLoggedIn(user) {
-  document.getElementById('userStrip').style.display = 'none';
-  document.getElementById('userStripLogged').style.display = 'flex';
-  document.getElementById('usrName').textContent = user.username;
-  document.getElementById('usrRating').textContent = user.rating || 1000;
-  document.getElementById('usrW').textContent = user.wins || 0;
-  document.getElementById('usrL').textContent = user.losses || 0;
-  document.getElementById('usrD').textContent = user.draws || 0;
+  document.getElementById('navRight').style.display = 'none';
+  document.getElementById('navRightLogged').style.display = 'flex';
+  document.getElementById('navUserName').textContent = user.username + ' (' + (user.rating || 1000) + '分)';
 }
 
 function showLoggedOut() {
-  document.getElementById('userStrip').style.display = 'flex';
-  document.getElementById('userStripLogged').style.display = 'none';
+  document.getElementById('navRight').style.display = 'flex';
+  document.getElementById('navRightLogged').style.display = 'none';
 }
 </script>
 
@@ -495,9 +497,9 @@ window.addEventListener('DOMContentLoaded', function() {
 
   function showModal(title, message, buttons = []) {
     const m = document.createElement('div');
-    m.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:999;';
-    let bHTML = buttons.map(b => `<button id="${b.id||''}" style="margin:4px;padding:8px 16px;border-radius:6px;border:1px solid #38bdf8;background:#1a1f2e;color:#38bdf8;cursor:pointer;font-weight:bold;">${b.text}</button>`).join('');
-    m.innerHTML = `<div style="background:#1a1f2e;border:1px solid #38bdf8;border-radius:12px;padding:24px;text-align:center;max-width:360px;width:90%;"><h3 style="color:#e2e8f0;margin-bottom:10px;">${title}</h3><p style="color:#94a3b8;margin-bottom:12px;">${message}</p>${bHTML}</div>`;
+    m.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:999;';
+    let bHTML = buttons.map(b => `<button id="${b.id||''}" style="margin:4px;padding:8px 16px;border-radius:6px;border:1px solid #8B6914;background:#fff;color:#8B6914;cursor:pointer;font-weight:bold;">${b.text}</button>`).join('');
+    m.innerHTML = `<div style="background:#fff;border-radius:12px;padding:24px;text-align:center;max-width:360px;width:90%;box-shadow:0 10px 40px rgba(0,0,0,0.2);"><h3 style="color:#333;margin-bottom:10px;">${title}</h3><p style="color:#888;margin-bottom:12px;">${message}</p>${bHTML}</div>`;
     document.body.appendChild(m);
     buttons.forEach(b => { if (b.id && b.onClick) { const el = document.getElementById(b.id); if (el) el.addEventListener('click', () => { b.onClick(); m.remove(); }); } });
     return m;
@@ -537,10 +539,9 @@ window.addEventListener('DOMContentLoaded', function() {
     if (!mainClockEl) return;
     const t = currentPlayer === BLACK ? blackTime : whiteTime;
     mainClockEl.textContent = formatTime(t);
-    mainClockEl.style.color = (currentPlayer === BLACK ? blackTime : whiteTime) <= 30 ? '#f87171' : '#38bdf8';
+    mainClockEl.style.color = (currentPlayer === BLACK ? blackTime : whiteTime) <= 30 ? '#e53e3e' : '#8B6914';
   }
 
-  // Socket
   if (socket) {
     socket.on('connect', () => console.log('已连接'));
     socket.on('privateRoomCreated', ({ roomId }) => {
@@ -571,10 +572,7 @@ window.addEventListener('DOMContentLoaded', function() {
           if (result) fetch('/api/update-stats', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ result }) })
             .then(r => r.json()).then(data => {
               if (data.stats) {
-                document.getElementById('usrRating').textContent = data.stats.rating;
-                document.getElementById('usrW').textContent = data.stats.wins;
-                document.getElementById('usrL').textContent = data.stats.losses;
-                document.getElementById('usrD').textContent = data.stats.draws;
+                document.getElementById('navUserName').textContent = data.stats.username ? data.stats.username + ' (' + data.stats.rating + '分)' : (data.stats.rating + '分');
               }
             });
         }
@@ -698,9 +696,9 @@ window.addEventListener('DOMContentLoaded', function() {
   function updateUI() {
     if (!turnTextEl) return;
     let txt;
-    if (winner) { txt = `🏆 ${winner === BLACK ? '黑方' : '白方'} 获胜！`; turnTextEl.style.color = '#fbbf24'; }
-    else if (isDraw) { txt = '🤝 平局'; turnTextEl.style.color = '#94a3b8'; }
-    else { txt = `${currentPlayer === BLACK ? '⚫ 黑方' : '⚪ 白方'} 回合${gameMode === MODE_ONLINE ? (isMyTurn ? ' (你)' : ' (对手)') : ''}`; turnTextEl.style.color = '#e2e8f0'; }
+    if (winner) { txt = `🏆 ${winner === BLACK ? '黑方' : '白方'} 获胜！`; turnTextEl.style.color = '#8B6914'; }
+    else if (isDraw) { txt = '🤝 平局'; turnTextEl.style.color = '#888'; }
+    else { txt = `${currentPlayer === BLACK ? '⚫ 黑方' : '⚪ 白方'} 回合${gameMode === MODE_ONLINE ? (isMyTurn ? ' (你)' : ' (对手)') : ''}`; turnTextEl.style.color = '#333'; }
     turnTextEl.textContent = txt;
     if (moveCountEl) moveCountEl.textContent = `步数 ${moveCount}`;
     updateClockDisplay();
@@ -719,23 +717,18 @@ window.addEventListener('DOMContentLoaded', function() {
   function drawBoard() {
     if (!ctx) return;
     ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-    const grad = ctx.createLinearGradient(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-    grad.addColorStop(0, '#2d2416'); grad.addColorStop(0.4, '#3b2e1e'); grad.addColorStop(0.8, '#4a3824'); grad.addColorStop(1, '#1f180c');
-    ctx.fillStyle = grad; ctx.beginPath(); ctx.roundRect(0, 0, CANVAS_SIZE, CANVAS_SIZE, 16); ctx.fill();
-    ctx.save(); ctx.globalAlpha = 0.2; ctx.strokeStyle = '#6b5a3e'; ctx.lineWidth = 0.6;
-    for (let i = 0; i < CANVAS_SIZE; i += 30) { ctx.beginPath(); ctx.moveTo(0, i+8); ctx.quadraticCurveTo(CANVAS_SIZE/2, i-4, CANVAS_SIZE, i+12); ctx.stroke(); }
-    ctx.restore();
-    ctx.strokeStyle = '#6b7a8f'; ctx.lineWidth = 0.8; ctx.globalAlpha = 0.6;
+    ctx.fillStyle = '#e8d5a3';
+    ctx.beginPath(); ctx.roundRect(0, 0, CANVAS_SIZE, CANVAS_SIZE, 14); ctx.fill();
+    ctx.strokeStyle = '#5a4a2a'; ctx.lineWidth = 1;
     for (let i = 0; i < BOARD_SIZE; i++) {
       const pos = PADDING + i*CELL_SIZE;
       ctx.beginPath(); ctx.moveTo(PADDING, pos); ctx.lineTo(PADDING + (BOARD_SIZE-1)*CELL_SIZE, pos); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(pos, PADDING); ctx.lineTo(pos, PADDING + (BOARD_SIZE-1)*CELL_SIZE); ctx.stroke();
     }
-    ctx.globalAlpha = 1;
     const starPoints = [[3,3],[3,11],[7,7],[11,3],[11,11]];
     for (let [r, c] of starPoints) {
       const x = PADDING + c*CELL_SIZE, y = PADDING + r*CELL_SIZE;
-      ctx.fillStyle = '#e2e8f0'; ctx.beginPath(); ctx.arc(x, y, 3.5, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#5a4a2a'; ctx.beginPath(); ctx.arc(x, y, 3.5, 0, Math.PI*2); ctx.fill();
     }
     let lastMoveRow = -1, lastMoveCol = -1;
     if (historyStack.length > 0) {
@@ -758,38 +751,32 @@ window.addEventListener('DOMContentLoaded', function() {
           } else animatingStone = null;
         }
         const dr = radius * scale;
-        ctx.save(); ctx.shadowColor='rgba(0,0,0,0.6)'; ctx.shadowBlur=6; ctx.shadowOffsetX=1; ctx.shadowOffsetY=2;
+        ctx.save(); ctx.shadowColor='rgba(0,0,0,0.4)'; ctx.shadowBlur=4; ctx.shadowOffsetX=1; ctx.shadowOffsetY=2;
         const g = ctx.createRadialGradient(x-dr*0.25, y-dr*0.3, dr*0.05, x, y, dr);
-        if (stone===BLACK) { g.addColorStop(0,'#6b7280'); g.addColorStop(0.3,'#374151'); g.addColorStop(0.7,'#111827'); g.addColorStop(1,'#030712'); }
-        else { g.addColorStop(0,'#fff'); g.addColorStop(0.3,'#f3f4f6'); g.addColorStop(0.7,'#d1d5db'); g.addColorStop(1,'#9ca3af'); }
+        if (stone===BLACK) { g.addColorStop(0,'#555'); g.addColorStop(0.5,'#1a1a1a'); g.addColorStop(1,'#000'); }
+        else { g.addColorStop(0,'#fff'); g.addColorStop(0.4,'#f0f0f0'); g.addColorStop(1,'#ccc'); }
         ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x, y, dr, 0, Math.PI*2); ctx.fill();
         ctx.shadowColor='transparent'; ctx.shadowBlur=0; ctx.shadowOffsetX=0; ctx.shadowOffsetY=0;
         ctx.fillStyle=stone===BLACK?'rgba(255,255,255,0.15)':'rgba(255,255,255,0.7)';
         ctx.beginPath(); ctx.arc(x-dr*0.3, y-dr*0.35, dr*0.2, 0, Math.PI*2); ctx.fill();
         ctx.restore();
         if (isWinStone) {
-          ctx.save(); ctx.shadowColor='#fbbf24'; ctx.shadowBlur=14; ctx.strokeStyle='#fcd34d'; ctx.lineWidth=2;
-          ctx.beginPath(); ctx.arc(x, y, dr+2, 0, Math.PI*2); ctx.stroke();
-          ctx.shadowBlur=0; ctx.strokeStyle='#f59e0b'; ctx.lineWidth=1.2;
-          ctx.beginPath(); ctx.arc(x, y, dr+3, 0, Math.PI*2); ctx.setLineDash([3,2]); ctx.stroke(); ctx.setLineDash([]);
-          ctx.restore();
+          ctx.save(); ctx.shadowColor='#fbbf24'; ctx.shadowBlur=12; ctx.strokeStyle='#f59e0b'; ctx.lineWidth=2;
+          ctx.beginPath(); ctx.arc(x, y, dr+2, 0, Math.PI*2); ctx.stroke(); ctx.restore();
         }
         if (isLastMove && !winner && !isDraw) {
-          ctx.save(); ctx.fillStyle='#ef4444'; ctx.shadowColor='#ef4444'; ctx.shadowBlur=5;
-          ctx.beginPath(); ctx.arc(x, y, dr*0.2, 0, Math.PI*2); ctx.fill(); ctx.restore();
+          ctx.save(); ctx.fillStyle='#ef4444'; ctx.shadowColor='#ef4444'; ctx.shadowBlur=4;
+          ctx.beginPath(); ctx.arc(x, y, dr*0.18, 0, Math.PI*2); ctx.fill(); ctx.restore();
         }
       }
     }
     const canPlace = gameMode !== MODE_ONLINE || isMyTurn;
     if (!winner && !isDraw && !isAiThinking && canPlace && hoverRow>=0 && hoverCol>=0 && board[hoverRow][hoverCol]===EMPTY) {
       const x = PADDING+hoverCol*CELL_SIZE, y = PADDING+hoverRow*CELL_SIZE, r = CELL_SIZE*0.43;
-      ctx.globalAlpha=0.4;
-      const g = ctx.createRadialGradient(x-r*0.3, y-r*0.3, r*0.1, x, y, r);
-      if (currentPlayer===BLACK) { g.addColorStop(0,'#4b5563'); g.addColorStop(0.8,'#111827'); }
-      else { g.addColorStop(0,'#fff'); g.addColorStop(0.8,'#cbd5e1'); }
-      ctx.fillStyle=g; ctx.shadowColor='#000'; ctx.shadowBlur=6;
+      ctx.globalAlpha=0.35;
+      ctx.fillStyle=currentPlayer===BLACK?'#333':'#ddd';
       ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
-      ctx.globalAlpha=1; ctx.shadowBlur=0;
+      ctx.globalAlpha=1;
     }
   }
 

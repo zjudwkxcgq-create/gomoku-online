@@ -37,6 +37,96 @@
       color: #e2e8f0;
     }
 
+    /* ============ 登录注册样式 ============ */
+    #auth-container {
+      width: 100%;
+      max-width: 720px;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(71, 85, 105, 0.45);
+      border-radius: 2rem;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      margin-bottom: 20px;
+      color: #e2e8f0;
+    }
+
+    #auth-container h3 {
+      margin-top: 0;
+      color: #38bdf8;
+    }
+
+    #auth-container input {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 8px;
+      border: 1px solid #475569;
+      background: rgba(30, 41, 59, 0.7);
+      color: #e2e8f0;
+      box-sizing: border-box;
+    }
+
+    #auth-container button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      background: rgba(56, 189, 248, 0.2);
+      color: #e0f2fe;
+      border: 1px solid #38bdf8;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+
+    #auth-container button:hover {
+      background: rgba(56, 189, 248, 0.35);
+    }
+
+    #auth-container .logout-btn {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+      color: #fca5a5;
+      padding: 8px 20px;
+      width: auto;
+    }
+
+    #auth-container .logout-btn:hover {
+      background: rgba(239, 68, 68, 0.35);
+    }
+
+    #auth-container hr {
+      border-color: #334155;
+      margin: 16px 0;
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 8px;
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid #475569;
+      border-radius: 8px;
+      color: #94a3b8;
+      cursor: pointer;
+      text-align: center;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .auth-tab.active {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: #38bdf8;
+      color: #e0f2fe;
+    }
+    /* ============ 登录注册样式结束 ============ */
+
     .mode-selector {
       width: 100%;
       display: flex;
@@ -399,10 +489,181 @@
   </style>
 </head>
 <body>
+  <!-- ============ 登录注册框（在棋盘外面） ============ -->
+  <div id="auth-container">
+    <!-- 未登录时显示 -->
+    <div id="auth-forms">
+      <!-- 切换标签 -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab('login')">登录</button>
+        <button class="auth-tab" onclick="switchAuthTab('register')">注册</button>
+      </div>
+
+      <!-- 登录表单 -->
+      <div id="login-form">
+        <h3>登录</h3>
+        <input type="text" id="login-username" placeholder="用户名或邮箱">
+        <input type="password" id="login-password" placeholder="密码">
+        <button onclick="handleLogin()">登录</button>
+      </div>
+
+      <!-- 注册表单 -->
+      <div id="register-form" style="display:none;">
+        <h3>注册</h3>
+        <input type="text" id="reg-username" placeholder="用户名">
+        <input type="email" id="reg-email" placeholder="邮箱">
+        <input type="password" id="reg-password" placeholder="密码">
+        <input type="password" id="reg-confirm" placeholder="确认密码">
+        <button onclick="handleRegister()">注册</button>
+      </div>
+    </div>
+
+    <!-- 已登录时显示 -->
+    <div id="user-panel" style="display:none; text-align:center;">
+      <h3>欢迎，<span id="display-name"></span></h3>
+      <p>段位分：<span id="display-rating" style="color:#fbbf24; font-size:24px; font-weight:bold;">1000</span></p>
+      <p style="color:#94a3b8;">战绩：胜 <span id="display-wins">0</span> / 负 <span id="display-losses">0</span> / 平 <span id="display-draws">0</span></p>
+      <button class="logout-btn" onclick="handleLogout()">退出登录</button>
+    </div>
+  </div>
+  <!-- ============ 登录注册框结束 ============ -->
+
   <div id="app"></div>
 
   <script src="/socket.io/socket.io.js"></script>
   
+  <script>
+    // ============ 用户系统逻辑 ============
+    
+    // 切换登录/注册标签
+    function switchAuthTab(tab) {
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      if (tab === 'login') {
+        document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
+        document.getElementById('login-form').style.display = 'block';
+        document.getElementById('register-form').style.display = 'none';
+      } else {
+        document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('register-form').style.display = 'block';
+      }
+    }
+
+    // 页面加载时检查登录状态
+    window.addEventListener('DOMContentLoaded', function() {
+      var token = localStorage.getItem('token');
+      if (token) {
+        fetch('/api/me', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        })
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (data.user) {
+              showLoggedIn(data.user);
+            } else {
+              localStorage.clear();
+              showLoggedOut();
+            }
+          })
+          .catch(function() {
+            showLoggedOut();
+          });
+      } else {
+        showLoggedOut();
+      }
+    });
+
+    // 登录
+    async function handleLogin() {
+      var username = document.getElementById('login-username').value.trim();
+      var password = document.getElementById('login-password').value;
+
+      if (!username || !password) {
+        alert('请填写用户名和密码');
+        return;
+      }
+
+      try {
+        var res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: username, password: password })
+        });
+        var data = await res.json();
+
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+          showLoggedIn(data.user);
+        } else {
+          alert(data.error || '登录失败');
+        }
+      } catch (err) {
+        alert('网络错误，请重试');
+      }
+    }
+
+    // 注册
+    async function handleRegister() {
+      var username = document.getElementById('reg-username').value.trim();
+      var email = document.getElementById('reg-email').value.trim();
+      var password = document.getElementById('reg-password').value;
+      var confirm = document.getElementById('reg-confirm').value;
+
+      if (!username || !email || !password) {
+        alert('请填写所有字段');
+        return;
+      }
+      if (password !== confirm) {
+        alert('两次输入的密码不一致');
+        return;
+      }
+
+      try {
+        var res = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: username, email: email, password: password })
+        });
+        var data = await res.json();
+
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+          showLoggedIn(data.user);
+        } else {
+          alert(data.error || '注册失败');
+        }
+      } catch (err) {
+        alert('网络错误，请重试');
+      }
+    }
+
+    // 退出登录
+    function handleLogout() {
+      localStorage.clear();
+      showLoggedOut();
+    }
+
+    // 切换到已登录界面
+    function showLoggedIn(user) {
+      document.getElementById('auth-forms').style.display = 'none';
+      document.getElementById('user-panel').style.display = 'block';
+      document.getElementById('display-name').textContent = user.username;
+      document.getElementById('display-rating').textContent = user.rating || 1000;
+      document.getElementById('display-wins').textContent = user.wins || 0;
+      document.getElementById('display-losses').textContent = user.losses || 0;
+      document.getElementById('display-draws').textContent = user.draws || 0;
+    }
+
+    // 切换到未登录界面
+    function showLoggedOut() {
+      document.getElementById('auth-forms').style.display = 'block';
+      document.getElementById('user-panel').style.display = 'none';
+      document.getElementById('login-username').value = '';
+      document.getElementById('login-password').value = '';
+    }
+    // ============ 用户系统逻辑结束 ============
+  </script>
+
   <script>
     window.addEventListener('DOMContentLoaded', function() {
       
@@ -865,44 +1126,41 @@
       }
 
       // ---------- 游戏逻辑 ----------
- function resetGame() {
-    // 在线模式离开房间
-    if (gameMode === MODE_ONLINE && currentRoomId && socket) {
-        socket.emit('leaveRoom', { roomId: currentRoomId });
-        currentRoomId = null;
-        myColor = null;
-    }
-    
-    stopTimer();
-    
-    // 重置棋盘，但保持当前模式和颜色设置
-    board = Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(EMPTY));
-    currentPlayer = BLACK;
-    winner = null;
-    winningCells = [];
-    historyStack = [];
-    moveCount = 0;
-    isDraw = false;
-    blackTime = INITIAL_TIME;
-    whiteTime = INITIAL_TIME;
-    timerActive = false;
-    hoverRow = -1;
-    hoverCol = -1;
-    isMyTurn = true;
-    isAiThinking = false;
-    
-    const roomInfo = document.getElementById('roomInfo');
-    if (roomInfo) roomInfo.style.display = 'none';
-    
-    updateModeButtons();
-    updateUI();
-    drawBoard();
-    
-    // AI模式下，如果AI执黑先手，自动走第一步
-    if (gameMode === MODE_AI && aiColor === BLACK) {
-        setTimeout(() => aiMove(), 300);
-    }
-}
+      function resetGame() {
+        if (gameMode === MODE_ONLINE && currentRoomId && socket) {
+          socket.emit('leaveRoom', { roomId: currentRoomId });
+          currentRoomId = null;
+          myColor = null;
+        }
+        
+        stopTimer();
+        
+        board = Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(EMPTY));
+        currentPlayer = BLACK;
+        winner = null;
+        winningCells = [];
+        historyStack = [];
+        moveCount = 0;
+        isDraw = false;
+        blackTime = INITIAL_TIME;
+        whiteTime = INITIAL_TIME;
+        timerActive = false;
+        hoverRow = -1;
+        hoverCol = -1;
+        isMyTurn = true;
+        isAiThinking = false;
+        
+        const roomInfo = document.getElementById('roomInfo');
+        if (roomInfo) roomInfo.style.display = 'none';
+        
+        updateModeButtons();
+        updateUI();
+        drawBoard();
+        
+        if (gameMode === MODE_AI && aiColor === BLACK) {
+          setTimeout(() => aiMove(), 300);
+        }
+      }
 
       function undoMove() {
         if (isAiThinking) return;
@@ -1143,7 +1401,6 @@
         }
         ctx.globalAlpha = 1;
         
-        // 五个星位
         const starPoints = [[3, 3], [3, 11], [7, 7], [11, 3], [11, 11]];
         ctx.shadowColor = '#38bdf8';
         ctx.shadowBlur = 8;
@@ -1169,7 +1426,6 @@
         ctx.shadowBlur = 0;
         ctx.shadowColor = 'transparent';
         
-        // 棋子
         for (let r = 0; r < BOARD_SIZE; r++) {
           for (let c = 0; c < BOARD_SIZE; c++) {
             const stone = board[r][c];
@@ -1223,7 +1479,6 @@
           }
         }
         
-        // 悬停虚影
         const canPlace = gameMode !== MODE_ONLINE || isMyTurn;
         if (!winner && !isDraw && !isAiThinking && canPlace && hoverRow >= 0 && hoverCol >= 0 && board[hoverRow][hoverCol] === EMPTY) {
           const x = PADDING + hoverCol * CELL_SIZE;
@@ -1342,7 +1597,6 @@
         const roomInfo = document.getElementById('roomInfo');
         if (roomInfo) roomInfo.style.display = 'none';
         
-        // 重置颜色选择器
         document.querySelectorAll('.color-option').forEach(opt => {
           opt.classList.toggle('selected', parseInt(opt.dataset.color) === BLACK);
         });
@@ -1365,7 +1619,6 @@
           opt.classList.toggle('selected', parseInt(opt.dataset.color) === color);
         });
         
-        // 重置游戏
         board = Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(EMPTY));
         currentPlayer = BLACK;
         winner = null;
@@ -1465,17 +1718,14 @@
         blackTimerBox = document.getElementById('blackTimerBox');
         whiteTimerBox = document.getElementById('whiteTimerBox');
 
-        // 模式按钮
         document.querySelectorAll('.mode-btn').forEach(btn => {
           btn.addEventListener('click', () => switchMode(btn.dataset.mode));
         });
 
-        // AI颜色选择
         document.querySelectorAll('.color-option').forEach(opt => {
           opt.addEventListener('click', () => setPlayerColor(parseInt(opt.dataset.color)));
         });
 
-        // 在线控制
         document.getElementById('createRoomBtn').addEventListener('click', createPrivateRoom);
         document.getElementById('matchmakingBtn').addEventListener('click', () => {
           joinMatchmaking();
@@ -1507,7 +1757,6 @@
           return this;
         };
 
-        // 检查私人房间链接
         const pathRoomId = window.location.pathname.split('/room/')[1];
         if (pathRoomId && socket) {
           gameMode = MODE_ONLINE;

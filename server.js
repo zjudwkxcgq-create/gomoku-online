@@ -3,6 +3,9 @@ const http = require('http');
 const { Server } = require('socket.io');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
+const { Pool } = require('pg');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const server = http.createServer(app);
@@ -12,8 +15,159 @@ const io = new Server(server, {
   transports: ['polling', 'websocket']
 });
 
+// ==================== 数据库连接 ====================
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
+
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-change-me';
+
+// ==================== 自动建表 ====================
+(async () => {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(20) UNIQUE NOT NULL,
+        email VARCHAR(100) UNIQUE NOT NULL,
+        password_hash VARCHAR(255) NOT NULL,
+        avatar_url VARCHAR(255) DEFAULT '/default-avatar.png',
+        rating INT DEFAULT 1000,
+        wins INT DEFAULT 0,
+        losses INT DEFAULT 0,
+        draws INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+    `);
+    console.log('✅ 数据库表已就绪');
+  } catch (err) {
+    console.error('❌ 数据库表初始化失败:', err);
+  }
+})();
+
+// ==================== 中间件 ====================
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ==================== 用户系统 API ====================
+
+// 注册
+app.post('/api/register', async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: '请填写所有字段' });
+    }
+
+    const exists = await pool.query(
+      'SELECT id FROM users WHERE username=$1 OR email=$2',
+      [username, email]
+    );
+    if (exists.rows.length > 0) {
+      return res.status(409).json({ error: '用户名或邮箱已被注册' });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const result = await pool.query(
+      'INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id, username, rating, wins, losses, draws',
+      [username, email, passwordHash]
+    );
+
+    const token = jwt.sign(
+      { userId: result.rows[0].id, username: result.rows[0].username },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({ token, user: result.rows[0] });
+  } catch (err) {
+    console.error('注册错误:', err);
+    res.status(500).json({ error: '服务器错误' });
+  }
+});
+
+// 登录
+app.post('/api/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({ error: '请填写用户名和密码' });
+    }
+
+    const result = await pool.query(
+      'SELECT * FROM users WHERE username=$1 OR email=$1',
+      [username]
+    );
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: '用户名或密码错误' });
+    }
+
+    const user = result.rows[0];
+    const valid = await bcrypt.compare(password, user.password_hash);
+    if (!valid) {
+      return res.status(401).json({ error: '用户名或密码错误' });
+    }
+
+    const token = jwt.sign(
+      { userId: user.id, username: user.username },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        avatar_url: user.avatar_url,
+        rating: user.rating,
+        wins: user.wins,
+        losses: user.losses,
+        draws: user.draws
+      }
+    });
+  } catch (err) {
+    console.error('登录错误:', err);
+    res.status(500).json({ error: '服务器错误' });
+  }
+});
+
+// 验证身份中间件
+function authMiddleware(req, res, next) {
+  const header = req.headers.authorization;
+  if (!header) return res.status(401).json({ error: '未登录' });
+
+  try {
+    const token = header.split(' ')[1];
+    req.user = jwt.verify(token, JWT_SECRET);
+    next();
+  } catch (e) {
+    res.status(401).json({ error: '登录已过期，请重新登录' });
+  }
+}
+
+// 获取当前用户信息
+app.get('/api/me', authMiddleware, async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT id, username, email, avatar_url, rating, wins, losses, draws FROM users WHERE id=$1',
+      [req.user.userId]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: '用户不存在' });
+    }
+    res.json({ user: result.rows[0] });
+  } catch (err) {
+    console.error('获取用户信息错误:', err);
+    res.status(500).json({ error: '服务器错误' });
+  }
+});
+
+// ==================== 五子棋游戏逻辑 ====================
 const rooms = new Map();
 const BOARD_SIZE = 15;
 

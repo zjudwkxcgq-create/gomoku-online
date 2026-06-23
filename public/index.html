@@ -1462,6 +1462,20 @@
         ctx.shadowBlur = 0;
         ctx.shadowColor = 'transparent';
         
+                // 找最后一手位置
+        let lastMoveRow = -1, lastMoveCol = -1;
+        if (historyStack.length > 0) {
+          const prevBoard = historyStack[historyStack.length - 1].board;
+          for (let r = 0; r < BOARD_SIZE; r++) {
+            for (let c = 0; c < BOARD_SIZE; c++) {
+              if (board[r][c] !== EMPTY && prevBoard[r][c] === EMPTY) {
+                lastMoveRow = r;
+                lastMoveCol = c;
+              }
+            }
+          }
+        }
+
         for (let r = 0; r < BOARD_SIZE; r++) {
           for (let c = 0; c < BOARD_SIZE; c++) {
             const stone = board[r][c];
@@ -1469,23 +1483,27 @@
             
             const x = PADDING + c * CELL_SIZE;
             const y = PADDING + r * CELL_SIZE;
-            const radius = CELL_SIZE * 0.42;
+            const radius = CELL_SIZE * 0.43;
             const isWinStone = winningCells && winningCells.some(([wr, wc]) => wr === r && wc === c);
+            const isLastMove = (r === lastMoveRow && c === lastMoveCol);
             
-            ctx.shadowColor = '#000000';
-            ctx.shadowBlur = 10;
+            ctx.save();
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+            ctx.shadowBlur = 8;
             ctx.shadowOffsetX = 2;
             ctx.shadowOffsetY = 3;
             
-            const gradient = ctx.createRadialGradient(x - radius*0.3, y - radius*0.3, radius*0.1, x, y, radius);
+            const gradient = ctx.createRadialGradient(x - radius*0.25, y - radius*0.3, radius*0.05, x, y, radius);
             if (stone === BLACK) {
-              gradient.addColorStop(0, '#4b5563');
-              gradient.addColorStop(0.7, '#0f172a');
-              gradient.addColorStop(1, '#020617');
+              gradient.addColorStop(0, '#6b7280');
+              gradient.addColorStop(0.3, '#374151');
+              gradient.addColorStop(0.7, '#111827');
+              gradient.addColorStop(1, '#030712');
             } else {
               gradient.addColorStop(0, '#ffffff');
-              gradient.addColorStop(0.5, '#e2e8f0');
-              gradient.addColorStop(1, '#94a3b8');
+              gradient.addColorStop(0.3, '#f3f4f6');
+              gradient.addColorStop(0.7, '#d1d5db');
+              gradient.addColorStop(1, '#9ca3af');
             }
             ctx.fillStyle = gradient;
             
@@ -1493,23 +1511,45 @@
             ctx.arc(x, y, radius, 0, 2 * Math.PI);
             ctx.fill();
             
+            ctx.shadowColor = 'transparent';
             ctx.shadowBlur = 0;
             ctx.shadowOffsetX = 0;
             ctx.shadowOffsetY = 0;
-            ctx.fillStyle = stone === BLACK ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.7)';
+            ctx.fillStyle = stone === BLACK ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.8)';
             ctx.beginPath();
-            ctx.arc(x - radius*0.25, y - radius*0.25, radius*0.25, 0, 2*Math.PI);
+            ctx.arc(x - radius*0.3, y - radius*0.35, radius*0.2, 0, 2*Math.PI);
             ctx.fill();
+            
+            ctx.restore();
             
             if (isWinStone) {
               ctx.save();
               ctx.shadowColor = '#fbbf24';
-              ctx.shadowBlur = 14;
+              ctx.shadowBlur = 18;
               ctx.strokeStyle = '#fcd34d';
-              ctx.lineWidth = 2.2;
+              ctx.lineWidth = 2.5;
               ctx.beginPath();
               ctx.arc(x, y, radius + 2, 0, 2*Math.PI);
               ctx.stroke();
+              ctx.shadowBlur = 0;
+              ctx.strokeStyle = '#f59e0b';
+              ctx.lineWidth = 1.5;
+              ctx.beginPath();
+              ctx.arc(x, y, radius + 3, 0, 2*Math.PI);
+              ctx.setLineDash([4, 3]);
+              ctx.stroke();
+              ctx.setLineDash([]);
+              ctx.restore();
+            }
+            
+            if (isLastMove && !winner && !isDraw) {
+              ctx.save();
+              ctx.fillStyle = '#ef4444';
+              ctx.shadowColor = '#ef4444';
+              ctx.shadowBlur = 6;
+              ctx.beginPath();
+              ctx.arc(x, y, radius * 0.22, 0, 2 * Math.PI);
+              ctx.fill();
               ctx.restore();
             }
           }

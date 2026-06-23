@@ -719,6 +719,8 @@
       let timerActive = false;
 
       let hoverRow = -1, hoverCol = -1;
+      let animatingStone = null;  // 正在做动画的棋子 { row, col, startTime }
+      const ANIM_DURATION = 200;  // 动画持续 200 毫秒
 
       let canvas, ctx;
       let turnTextEl, moveCountEl, blackTimerEl, whiteTimerEl;
@@ -1235,6 +1237,7 @@
         
         board[row][col] = currentPlayer;
         moveCount++;
+        animatingStone = { row: row, col: col, startTime: performance.now() };
         
         const winResult = checkWin(row, col, currentPlayer);
         if (winResult) {
@@ -1484,6 +1487,23 @@
             const x = PADDING + c * CELL_SIZE;
             const y = PADDING + r * CELL_SIZE;
             const radius = CELL_SIZE * 0.43;
+
+    // 弹入动画缩放
+    let scale = 1;
+    if (animatingStone && animatingStone.row === r && animatingStone.col === c) {
+      const elapsed = performance.now() - animatingStone.startTime;
+      if (elapsed < ANIM_DURATION) {
+        // easeOutBack 缓动效果
+        const t = elapsed / ANIM_DURATION;
+        const c1 = 1.70158;
+        const c3 = c1 + 1;
+        scale = 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+        scale = Math.max(0, Math.min(1, scale));
+        requestAnimationFrame(drawBoard);
+      } else {
+        animatingStone = null;
+      }
+    }
             const isWinStone = winningCells && winningCells.some(([wr, wc]) => wr === r && wc === c);
             const isLastMove = (r === lastMoveRow && c === lastMoveCol);
             
@@ -1507,8 +1527,9 @@
             }
             ctx.fillStyle = gradient;
             
+            const drawRadius = radius * scale;
             ctx.beginPath();
-            ctx.arc(x, y, radius, 0, 2 * Math.PI);
+            ctx.arc(x, y, drawRadius, 0, 2 * Math.PI);
             ctx.fill();
             
             ctx.shadowColor = 'transparent';
@@ -1517,7 +1538,7 @@
             ctx.shadowOffsetY = 0;
             ctx.fillStyle = stone === BLACK ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.8)';
             ctx.beginPath();
-            ctx.arc(x - radius*0.3, y - radius*0.35, radius*0.2, 0, 2*Math.PI);
+            ctx.arc(x - drawRadius*0.3, y - drawRadius*0.35, drawRadius*0.2, 0, 2*Math.PI);
             ctx.fill();
             
             ctx.restore();
@@ -1529,13 +1550,13 @@
               ctx.strokeStyle = '#fcd34d';
               ctx.lineWidth = 2.5;
               ctx.beginPath();
-              ctx.arc(x, y, radius + 2, 0, 2*Math.PI);
+              ctx.arc(x, y, drawRadius + 2, 0, 2*Math.PI);
               ctx.stroke();
               ctx.shadowBlur = 0;
               ctx.strokeStyle = '#f59e0b';
               ctx.lineWidth = 1.5;
               ctx.beginPath();
-              ctx.arc(x, y, radius + 3, 0, 2*Math.PI);
+              ctx.arc(x, y, drawRadius + 3, 0, 2*Math.PI);
               ctx.setLineDash([4, 3]);
               ctx.stroke();
               ctx.setLineDash([]);
@@ -1548,7 +1569,7 @@
               ctx.shadowColor = '#ef4444';
               ctx.shadowBlur = 6;
               ctx.beginPath();
-              ctx.arc(x, y, radius * 0.22, 0, 2 * Math.PI);
+              ctx.arc(x, y, drawRadius * 0.22, 0, 2 * Math.PI);
               ctx.fill();
               ctx.restore();
             }

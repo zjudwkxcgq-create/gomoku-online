@@ -865,44 +865,44 @@
       }
 
       // ---------- 游戏逻辑 ----------
-      function resetGame() {
-        if (gameMode === MODE_ONLINE && currentRoomId && socket) {
-          socket.emit('leaveRoom', { roomId: currentRoomId });
-        }
-        
-        stopTimer();
+ function resetGame() {
+    // 在线模式离开房间
+    if (gameMode === MODE_ONLINE && currentRoomId && socket) {
+        socket.emit('leaveRoom', { roomId: currentRoomId });
         currentRoomId = null;
         myColor = null;
-        gameMode = MODE_PVP;
-        
-        board = Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(EMPTY));
-        currentPlayer = BLACK;
-        winner = null;
-        winningCells = [];
-        historyStack = [];
-        moveCount = 0;
-        isDraw = false;
-        blackTime = INITIAL_TIME;
-        whiteTime = INITIAL_TIME;
-        timerActive = false;
-        hoverRow = -1;
-        hoverCol = -1;
-        isMyTurn = true;
-        isAiThinking = false;
-        playerColor = BLACK;
-        aiColor = WHITE;
-        
-        const roomInfo = document.getElementById('roomInfo');
-        if (roomInfo) roomInfo.style.display = 'none';
-        
-        updateModeButtons();
-        updateUI();
-        drawBoard();
-        
-        if (gameMode === MODE_AI && aiColor === BLACK) {
-          setTimeout(() => aiMove(), 300);
-        }
-      }
+    }
+    
+    stopTimer();
+    
+    // 重置棋盘，但保持当前模式和颜色设置
+    board = Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(EMPTY));
+    currentPlayer = BLACK;
+    winner = null;
+    winningCells = [];
+    historyStack = [];
+    moveCount = 0;
+    isDraw = false;
+    blackTime = INITIAL_TIME;
+    whiteTime = INITIAL_TIME;
+    timerActive = false;
+    hoverRow = -1;
+    hoverCol = -1;
+    isMyTurn = true;
+    isAiThinking = false;
+    
+    const roomInfo = document.getElementById('roomInfo');
+    if (roomInfo) roomInfo.style.display = 'none';
+    
+    updateModeButtons();
+    updateUI();
+    drawBoard();
+    
+    // AI模式下，如果AI执黑先手，自动走第一步
+    if (gameMode === MODE_AI && aiColor === BLACK) {
+        setTimeout(() => aiMove(), 300);
+    }
+}
 
       function undoMove() {
         if (isAiThinking) return;

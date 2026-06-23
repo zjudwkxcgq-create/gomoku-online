@@ -6,400 +6,259 @@
   <title>五子棋在线 - 免费五子棋游戏</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
       font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
-      background: #f5f0e8;
-      min-height: 100vh;
-      color: #333;
+      background: #f5f0e8; min-height: 100vh; color: #333;
     }
-
-    /* ===== 顶部导航栏 ===== */
     .navbar {
-      background: #fff;
-      border-bottom: 1px solid #e0d8cc;
-      padding: 0 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 52px;
+      background: #fff; border-bottom: 1px solid #e0d8cc; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between; height: 52px;
       box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
-    .nav-left {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-    }
-    .nav-logo {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #8B6914;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .nav-logo::before {
-      content: '⬡';
-      font-size: 1.3rem;
-    }
-    .nav-links {
-      display: flex;
-      gap: 4px;
-      list-style: none;
-    }
-    .nav-links a {
-      text-decoration: none;
-      color: #666;
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      transition: all 0.15s;
-    }
+    .nav-left { display: flex; align-items: center; gap: 24px; }
+    .nav-logo { font-size: 1.1rem; font-weight: 700; color: #8B6914; text-decoration: none; display: flex; align-items: center; gap: 6px; }
+    .nav-logo::before { content: '⬡'; font-size: 1.3rem; }
+    .nav-links { display: flex; gap: 4px; list-style: none; }
+    .nav-links a { text-decoration: none; color: #666; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; }
     .nav-links a:hover { background: #f5f0e8; color: #333; }
     .nav-links a.active { background: #f5f0e8; color: #8B6914; font-weight: 600; }
-
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .nav-right .user-btn {
-      padding: 6px 14px;
-      border-radius: 6px;
-      border: 1px solid #d0c8b8;
-      background: #fff;
-      color: #666;
-      cursor: pointer;
-      font-size: 0.8rem;
-      font-weight: 500;
-    }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .nav-right .user-btn { padding: 6px 14px; border-radius: 6px; border: 1px solid #d0c8b8; background: #fff; color: #666; cursor: pointer; font-size: 0.8rem; font-weight: 500; }
     .nav-right .user-btn:hover { background: #f5f0e8; }
-    .nav-right .user-btn.primary {
-      background: #8B6914;
-      color: #fff;
-      border-color: #8B6914;
-    }
-    .nav-right .user-btn.primary:hover { background: #6b4f0e; }
-
-    /* ===== 主容器 ===== */
-    .main-container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 16px 12px 40px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-    }
-
-    /* ===== 顶部玩家信息 ===== */
-    .top-bar {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-    .player-card {
-      background: #fff;
-      border: 1px solid #e0d8cc;
-      border-radius: 10px;
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-      flex: 1;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    }
-    .player-avatar {
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .player-avatar.black-av {
-      background: radial-gradient(circle at 35% 35%, #555, #111);
-      border: 2px solid #444;
-    }
-    .player-avatar.white-av {
-      background: radial-gradient(circle at 35% 35%, #fff, #ccc);
-      border: 2px solid #ccc;
-    }
-    .player-name {
-      font-size: 0.85rem;
-      color: #333;
-      font-weight: 600;
-    }
-    .player-rating {
-      font-size: 0.7rem;
-      color: #999;
-    }
-    .timer-center {
-      text-align: center;
-      min-width: 60px;
-    }
-    .timer-center .vs-text {
-      font-size: 0.65rem;
-      color: #bbb;
-      letter-spacing: 1px;
-    }
-    .timer-center .clock {
-      font-family: 'Fira Code', monospace;
-      font-size: 1rem;
-      color: #8B6914;
-      font-weight: 600;
-    }
-
-    /* ===== 模式切换 ===== */
-    .mode-row {
-      display: flex;
-      gap: 4px;
-      width: 100%;
-    }
-    .mode-btn {
-      flex: 1;
-      padding: 7px 0;
-      border-radius: 6px;
-      border: 1px solid #d0c8b8;
-      background: #fff;
-      color: #888;
-      cursor: pointer;
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-align: center;
-    }
+    .nav-right .user-btn.primary { background: #8B6914; color: #fff; border-color: #8B6914; }
+    .main-container { max-width: 600px; margin: 0 auto; padding: 16px 12px 40px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .top-bar { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .player-card { background: #fff; border: 1px solid #e0d8cc; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    .player-avatar { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; }
+    .player-avatar.black-av { background: radial-gradient(circle at 35% 35%, #555, #111); border: 2px solid #444; }
+    .player-avatar.white-av { background: radial-gradient(circle at 35% 35%, #fff, #ccc); border: 2px solid #ccc; }
+    .player-name { font-size: 0.85rem; color: #333; font-weight: 600; }
+    .player-rating { font-size: 0.7rem; color: #999; }
+    .timer-center { text-align: center; min-width: 60px; }
+    .timer-center .vs-text { font-size: 0.65rem; color: #bbb; letter-spacing: 1px; }
+    .timer-center .clock { font-family: 'Fira Code', monospace; font-size: 1rem; color: #8B6914; font-weight: 600; }
+    .mode-row { display: flex; gap: 4px; width: 100%; }
+    .mode-btn { flex: 1; padding: 7px 0; border-radius: 6px; border: 1px solid #d0c8b8; background: #fff; color: #888; cursor: pointer; font-size: 0.75rem; font-weight: 600; text-align: center; }
     .mode-btn:hover { border-color: #8B6914; color: #8B6914; }
-    .mode-btn.active {
-      background: #8B6914;
-      color: #fff;
-      border-color: #8B6914;
-    }
-
-    .online-row {
-      display: flex; gap: 6px; width: 100%;
-    }
-    .online-row button {
-      flex: 1; padding: 6px 0; border-radius: 6px;
-      border: 1px solid #8B6914; background: #fff;
-      color: #8B6914; cursor: pointer; font-size: 0.75rem; font-weight: 600;
-    }
+    .mode-btn.active { background: #8B6914; color: #fff; border-color: #8B6914; }
+    .online-row { display: flex; gap: 6px; width: 100%; }
+    .online-row button { flex: 1; padding: 6px 0; border-radius: 6px; border: 1px solid #8B6914; background: #fff; color: #8B6914; cursor: pointer; font-size: 0.75rem; font-weight: 600; }
     .online-row button:hover { background: #8B6914; color: #fff; }
-
-    .room-id-text {
-      font-size: 0.75rem; color: #999; text-align: center;
-    }
+    .room-id-text { font-size: 0.75rem; color: #999; text-align: center; }
     .room-id-text span { color: #8B6914; font-family: 'Fira Code', monospace; }
-
-    /* ===== 状态行 ===== */
-    .status-row {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.8rem;
-    }
+    .status-row { width: 100%; display: flex; justify-content: space-between; font-size: 0.8rem; }
     .turn-text { color: #333; font-weight: 600; }
     .move-text { color: #999; }
-
-    /* ===== 棋盘 ===== */
-    canvas {
-      display: block;
-      border-radius: 10px;
-      cursor: pointer;
-      max-width: 100%;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
-
-    /* ===== 按钮 ===== */
-    .action-row {
-      display: flex; gap: 8px; width: 100%;
-    }
-    .btn {
-      flex: 1; padding: 8px 0; border-radius: 8px;
-      border: 1px solid #d0c8b8; background: #fff;
-      color: #666; cursor: pointer; font-size: 0.8rem; font-weight: 600;
-    }
+    canvas { display: block; border-radius: 10px; cursor: pointer; max-width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .action-row { display: flex; gap: 8px; width: 100%; }
+    .btn { flex: 1; padding: 8px 0; border-radius: 8px; border: 1px solid #d0c8b8; background: #fff; color: #666; cursor: pointer; font-size: 0.8rem; font-weight: 600; }
     .btn:hover { background: #f5f0e8; color: #333; }
-
-    /* ===== 登录弹窗 ===== */
-    .auth-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5); display: flex; align-items: center;
-      justify-content: center; z-index: 999;
-    }
-    .auth-card {
-      background: #fff; border-radius: 14px; padding: 28px;
-      width: 90%; max-width: 340px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-    }
+    .auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 999; }
+    .auth-card { background: #fff; border-radius: 14px; padding: 28px; width: 90%; max-width: 340px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
     .auth-card h3 { color: #8B6914; margin-bottom: 12px; font-size: 0.95rem; }
-    .auth-card input {
-      width: 100%; padding: 9px; margin: 4px 0;
-      border-radius: 6px; border: 1px solid #d0c8b8;
-      background: #faf7f0; font-size: 0.85rem;
-    }
-    .auth-card button {
-      width: 100%; padding: 9px; margin-top: 8px;
-      background: #8B6914; color: #fff;
-      border: none; border-radius: 6px; cursor: pointer;
-      font-weight: bold; font-size: 0.85rem;
-    }
+    .auth-card input { width: 100%; padding: 9px; margin: 4px 0; border-radius: 6px; border: 1px solid #d0c8b8; background: #faf7f0; font-size: 0.85rem; }
+    .auth-card button { width: 100%; padding: 9px; margin-top: 8px; background: #8B6914; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
     .auth-tabs { display: flex; gap: 4px; margin-bottom: 10px; }
-    .auth-tab {
-      flex: 1; padding: 6px; background: #f5f0e8;
-      border: 1px solid #d0c8b8; border-radius: 6px;
-      color: #888; cursor: pointer; font-size: 0.75rem; text-align: center;
-    }
+    .auth-tab { flex: 1; padding: 6px; background: #f5f0e8; border: 1px solid #d0c8b8; border-radius: 6px; color: #888; cursor: pointer; font-size: 0.75rem; text-align: center; }
     .auth-tab.active { background: #8B6914; color: #fff; border-color: #8B6914; }
-
-    /* 颜色选择 */
-    .color-pick-row {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 0.7rem; color: #999; justify-content: center;
-    }
-    .color-dot {
-      width: 20px; height: 20px; border-radius: 50%; cursor: pointer;
-      border: 2px solid transparent;
-    }
+    .color-pick-row { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: #999; justify-content: center; }
+    .color-dot { width: 20px; height: 20px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
     .color-dot.black-dot { background: radial-gradient(circle at 35% 35%, #555, #111); }
     .color-dot.white-dot { background: radial-gradient(circle at 35% 35%, #fff, #ccc); }
     .color-dot.sel { border-color: #8B6914; }
-
-    /* 通知 */
-    .notification {
-      position: fixed; top: 64px; left: 50%; transform: translateX(-50%);
-      background: #fff; border: 1px solid #8B6914; padding: 8px 20px;
-      border-radius: 8px; color: #333; z-index: 1000; font-size: 0.8rem;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-    }
-
-    /* 移动端导航 */
-    @media (max-width: 640px) {
-      .nav-links { display: none; }
-      .navbar { padding: 0 12px; }
-    }
+    .notification { position: fixed; top: 64px; left: 50%; transform: translateX(-50%); background: #fff; border: 1px solid #8B6914; padding: 8px 20px; border-radius: 8px; color: #333; z-index: 1000; font-size: 0.8rem; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    @media (max-width: 640px) { .nav-links { display: none; } .navbar { padding: 0 12px; } }
   </style>
 </head>
 <body>
 
-<!-- ===== 顶部导航栏 ===== -->
 <nav class="navbar">
   <div class="nav-left">
-    <a href="/" class="nav-logo">五子棋在线</a>
+    <a href="/" class="nav-logo" id="navLogo">五子棋在线</a>
     <ul class="nav-links">
-      <li><a href="/" class="active">开始游戏</a></li>
-      <li><a href="#" onclick="alert('排行榜功能即将上线！')">排行榜</a></li>
-      <li><a href="#" onclick="alert('游戏规则：五子连珠即获胜，黑棋先行。')">游戏规则</a></li>
-      <li><a href="#" onclick="alert('五子棋在线 - 免费在线五子棋对弈平台')">关于</a></li>
+      <li><a href="/" class="active" id="navHome">开始游戏</a></li>
+      <li><a href="#" onclick="alert(t('leaderboardSoon'))" id="navLb">排行榜</a></li>
+      <li><a href="#" onclick="alert(t('rulesText'))" id="navRules">游戏规则</a></li>
+      <li><a href="#" onclick="alert(t('aboutText'))" id="navAbout">关于</a></li>
     </ul>
   </div>
   <div class="nav-right" id="navRight">
-    <button class="user-btn" onclick="showAuth()">登录</button>
-    <button class="user-btn primary" onclick="showAuth(); switchAuthTab('register')">注册</button>
+    <button class="user-btn" onclick="showAuth()" id="btnLoginNav">登录</button>
+    <button class="user-btn primary" onclick="showAuth(); switchAuthTab('register')" id="btnRegNav">注册</button>
   </div>
   <div class="nav-right" id="navRightLogged" style="display:none;">
     <span style="font-size:0.8rem;color:#666;margin-right:6px;" id="navUserName"></span>
-    <button class="user-btn" onclick="handleLogout()">退出</button>
+    <button class="user-btn" onclick="handleLogout()" id="btnLogoutNav">退出</button>
   </div>
 </nav>
 
-<!-- ===== 主内容 ===== -->
 <div class="main-container">
-
-  <!-- 玩家信息 -->
   <div class="top-bar">
-    <div class="player-card">
-      <div class="player-avatar black-av"></div>
-      <div>
-        <div class="player-name" id="blackName">⚫ 黑方</div>
-        <div class="player-rating" id="blackInfo">先手</div>
-      </div>
-    </div>
-    <div class="timer-center">
-      <div class="vs-text">VS</div>
-      <div class="clock" id="mainClock">10:00</div>
-    </div>
-    <div class="player-card">
-      <div class="player-avatar white-av"></div>
-      <div>
-        <div class="player-name" id="whiteName">⚪ 白方</div>
-        <div class="player-rating" id="whiteInfo">后手</div>
-      </div>
-    </div>
+    <div class="player-card"><div class="player-avatar black-av"></div><div><div class="player-name" id="blackName">⚫ 黑方</div><div class="player-rating" id="blackInfo">先手</div></div></div>
+    <div class="timer-center"><div class="vs-text" id="vsText">VS</div><div class="clock" id="mainClock">10:00</div></div>
+    <div class="player-card"><div class="player-avatar white-av"></div><div><div class="player-name" id="whiteName">⚪ 白方</div><div class="player-rating" id="whiteInfo">后手</div></div></div>
   </div>
-
-  <!-- 模式 -->
   <div class="mode-row">
-    <button class="mode-btn active" data-mode="pvp">👥 本地双人</button>
-    <button class="mode-btn" data-mode="ai">🤖 AI对战</button>
-    <button class="mode-btn" data-mode="online">🌐 在线联机</button>
+    <button class="mode-btn active" data-mode="pvp" id="modePvp">👥 本地双人</button>
+    <button class="mode-btn" data-mode="ai" id="modeAi">🤖 AI对战</button>
+    <button class="mode-btn" data-mode="online" id="modeOnline">🌐 在线联机</button>
   </div>
-
   <div class="online-row" id="onlineControls" style="display:none;">
     <button id="createRoomBtn">🏠 创建房间</button>
     <button id="matchmakingBtn">🎯 快速匹配</button>
   </div>
-
   <div class="color-pick-row" id="aiSettings" style="display:none;">
-    选择棋子：
-    <div class="color-dot black-dot sel" data-color="1"></div>
-    <div class="color-dot white-dot" data-color="2"></div>
+    <span id="chooseColor">选择棋子：</span><div class="color-dot black-dot sel" data-color="1"></div><div class="color-dot white-dot" data-color="2"></div>
   </div>
-
-  <div class="room-id-text" id="roomInfo" style="display:none;">
-    房间号：<span id="roomIdDisplay">------</span>（已复制到剪贴板）
-  </div>
-
-  <!-- 状态 -->
-  <div class="status-row">
-    <span class="turn-text" id="turnText">⚫ 黑方回合</span>
-    <span class="move-text" id="moveCount">步数 0</span>
-  </div>
-
-  <!-- 棋盘 -->
+  <div class="room-id-text" id="roomInfo" style="display:none;"><span id="roomIdLabel">房间号：</span><span id="roomIdDisplay">------</span><span id="roomCopied">（已复制到剪贴板）</span></div>
+  <div class="status-row"><span class="turn-text" id="turnText">⚫ 黑方回合</span><span class="move-text" id="moveCount">步数 0</span></div>
   <canvas id="boardCanvas"></canvas>
-
-  <!-- 按钮 -->
   <div class="action-row">
     <button class="btn" id="resetBtn">↺ 新的一局</button>
     <button class="btn" id="undoBtn">↩ 悔棋</button>
   </div>
-
 </div>
 
-<!-- ===== 登录弹窗 ===== -->
 <div class="auth-overlay" id="authOverlay" style="display:none;">
   <div class="auth-card">
     <div id="auth-forms">
       <div class="auth-tabs">
-        <button class="auth-tab active" onclick="switchAuthTab('login')">登录</button>
-        <button class="auth-tab" onclick="switchAuthTab('register')">注册</button>
+        <button class="auth-tab active" onclick="switchAuthTab('login')" id="tabLogin">登录</button>
+        <button class="auth-tab" onclick="switchAuthTab('register')" id="tabRegister">注册</button>
       </div>
       <div id="login-form">
-        <h3>登录</h3>
+        <h3 id="loginTitleH3">登录</h3>
         <input type="text" id="login-username" placeholder="用户名或邮箱">
         <input type="password" id="login-password" placeholder="密码">
-        <button onclick="handleLogin()">登录</button>
+        <button onclick="handleLogin()" id="btnLogin">登录</button>
       </div>
       <div id="register-form" style="display:none;">
-        <h3>注册</h3>
+        <h3 id="regTitleH3">注册</h3>
         <input type="text" id="reg-username" placeholder="用户名">
         <input type="email" id="reg-email" placeholder="邮箱">
         <input type="password" id="reg-password" placeholder="密码">
         <input type="password" id="reg-confirm" placeholder="确认密码">
-        <button onclick="handleRegister()">注册</button>
+        <button onclick="handleRegister()" id="btnRegister">注册</button>
       </div>
     </div>
-    <button style="width:100%;padding:8px;margin-top:8px;background:#f5f0e8;border:1px solid #d0c8b8;border-radius:6px;color:#888;cursor:pointer;font-size:0.8rem;" onclick="hideAuth()">关闭</button>
+    <button style="width:100%;padding:8px;margin-top:8px;background:#f5f0e8;border:1px solid #d0c8b8;border-radius:6px;color:#888;cursor:pointer;font-size:0.8rem;" onclick="hideAuth()" id="btnClose">关闭</button>
   </div>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
+// ========== 多语言 ==========
+let LANG = 'zh';
+(function () {
+  var bl = (navigator.language || navigator.userLanguage || 'zh').toLowerCase();
+  LANG = bl.startsWith('en') ? 'en' : 'zh';
+})();
+
+function t(key) {
+  var dict = {
+    login: { zh: '登录', en: 'Login' },
+    register: { zh: '注册', en: 'Register' },
+    usernameOrEmail: { zh: '用户名或邮箱', en: 'Username or Email' },
+    password: { zh: '密码', en: 'Password' },
+    username: { zh: '用户名', en: 'Username' },
+    email: { zh: '邮箱', en: 'Email' },
+    confirmPassword: { zh: '确认密码', en: 'Confirm Password' },
+    close: { zh: '关闭', en: 'Close' },
+    logout: { zh: '退出', en: 'Logout' },
+    notLoggedIn: { zh: '未登录', en: 'Not logged in' },
+    loginRegister: { zh: '登录 / 注册', en: 'Login / Register' },
+    fillAll: { zh: '请填写完整', en: 'Please fill in all fields' },
+    passwordMismatch: { zh: '两次密码不一致', en: 'Passwords do not match' },
+    fillAllFields: { zh: '请填写所有字段', en: 'Please fill in all fields' },
+    networkError: { zh: '网络错误，请重试', en: 'Network error, please try again' },
+    loginFailed: { zh: '登录失败', en: 'Login failed' },
+    registerFailed: { zh: '注册失败', en: 'Registration failed' },
+    home: { zh: '开始游戏', en: 'Play' },
+    leaderboard: { zh: '排行榜', en: 'Leaderboard' },
+    rules: { zh: '游戏规则', en: 'Rules' },
+    about: { zh: '关于', en: 'About' },
+    leaderboardSoon: { zh: '排行榜功能即将上线！', en: 'Leaderboard coming soon!' },
+    rulesText: { zh: '游戏规则：五子连珠即获胜，黑棋先行。', en: 'Rules: Get five in a row to win. Black plays first.' },
+    aboutText: { zh: '五子棋在线 - 免费在线五子棋对弈平台', en: 'Gomoku Online - Free online Gomoku platform' },
+    localPvP: { zh: '👥 本地双人', en: '👥 Local PvP' },
+    aiBattle: { zh: '🤖 AI对战', en: '🤖 AI Battle' },
+    online: { zh: '🌐 在线联机', en: '🌐 Online' },
+    createRoom: { zh: '🏠 创建房间', en: '🏠 Create Room' },
+    quickMatch: { zh: '🎯 快速匹配', en: '🎯 Quick Match' },
+    chooseColor: { zh: '选择棋子：', en: 'Choose color: ' },
+    roomId: { zh: '房间号：', en: 'Room: ' },
+    copied: { zh: '（已复制到剪贴板）', en: ' (copied)' },
+    newGame: { zh: '↺ 新的一局', en: '↺ New Game' },
+    undo: { zh: '↩ 悔棋', en: '↩ Undo' },
+    black: { zh: '⚫ 黑方', en: '⚫ Black' },
+    white: { zh: '⚪ 白方', en: '⚪ White' },
+    firstHand: { zh: '先手', en: 'First' },
+    secondHand: { zh: '后手', en: 'Second' },
+    thinking: { zh: '⏳ 思考中', en: '⏳ Thinking' },
+    moves: { zh: '步数', en: 'Moves' },
+    yourTurn: { zh: ' (你)', en: ' (You)' },
+    opponentTurn: { zh: ' (对手)', en: ' (Opp.)' },
+    blackWins: { zh: '🏆 黑方 获胜！', en: '🏆 Black Wins!' },
+    whiteWins: { zh: '🏆 白方 获胜！', en: '🏆 White Wins!' },
+    draw: { zh: '🤝 平局', en: '🤝 Draw' },
+    wins: { zh: '胜', en: 'W' },
+    losses: { zh: '负', en: 'L' },
+    draws: { zh: '平', en: 'D' },
+    inviteCopied: { zh: '✅ 邀请链接已复制！', en: '✅ Invite link copied!' },
+    roomNumber: { zh: '📋 房间号: ', en: '📋 Room: ' },
+    joined: { zh: '✅ 加入成功！执', en: '✅ Joined! Playing as ' },
+    youBlack: { zh: '😎 你(黑)', en: '😎 You(B)' },
+    youWhite: { zh: '😎 你(白)', en: '😎 You(W)' },
+    opponentBlack: { zh: '对手(黑)', en: 'Opp.(B)' },
+    opponentWhite: { zh: '对手(白)', en: 'Opp.(W)' },
+    undoRequest: { zh: '悔棋请求', en: 'Undo Request' },
+    undoRequestMsg: { zh: '对手请求悔棋', en: 'Opponent requests undo' },
+    accept: { zh: '同意', en: 'Accept' },
+    reject: { zh: '拒绝', en: 'Reject' },
+    undoRejected: { zh: '悔棋被拒绝', en: 'Undo rejected' },
+    undoSent: { zh: '已发送悔棋请求', en: 'Undo request sent' },
+    notConnected: { zh: '未连接', en: 'Not connected' },
+    disconnected: { zh: '对手已断开', en: 'Opponent disconnected' },
+    VS: { zh: 'VS', en: 'VS' },
+    loginTitle: { zh: '登录', en: 'Login' },
+    registerTitle: { zh: '注册', en: 'Register' },
+    title: { zh: '五子棋在线 - 免费五子棋游戏', en: 'Gomoku Online - Free Gomoku Game' },
+    navTitle: { zh: '五子棋在线', en: 'Gomoku Online' },
+    logo: { zh: '⬡', en: '⬡' },
+  };
+  return (dict[key] && dict[key][LANG]) || (dict[key] && dict[key]['zh']) || key;
+}
+
+// 初始化所有带 id 的文字
+function updateAllTexts() {
+  document.title = t('title');
+  var ids = {
+    navLogo: 'navTitle', navHome: 'home', navLb: 'leaderboard', navRules: 'rules', navAbout: 'about',
+    btnLoginNav: 'login', btnRegNav: 'register', btnLogoutNav: 'logout',
+    vsText: 'VS', modePvp: 'localPvP', modeAi: 'aiBattle', modeOnline: 'online',
+    createRoomBtn: 'createRoom', matchmakingBtn: 'quickMatch', chooseColor: 'chooseColor',
+    roomIdLabel: 'roomId', roomCopied: 'copied', resetBtn: 'newGame', undoBtn: 'undo',
+    blackName: 'black', whiteName: 'white', blackInfo: 'firstHand', whiteInfo: 'secondHand',
+    tabLogin: 'login', tabRegister: 'register', loginTitleH3: 'loginTitle', regTitleH3: 'registerTitle',
+    btnLogin: 'login', btnRegister: 'register', btnClose: 'close',
+  };
+  for (var id in ids) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = t(ids[id]);
+  }
+  // placeholder
+  document.getElementById('login-username').placeholder = t('usernameOrEmail');
+  document.getElementById('login-password').placeholder = t('password');
+  document.getElementById('reg-username').placeholder = t('username');
+  document.getElementById('reg-email').placeholder = t('email');
+  document.getElementById('reg-password').placeholder = t('password');
+  document.getElementById('reg-confirm').placeholder = t('confirmPassword');
+}
+updateAllTexts();
+
 // ========== 用户系统 ==========
 function showAuth() { document.getElementById('authOverlay').style.display = 'flex'; }
 function hideAuth() { document.getElementById('authOverlay').style.display = 'none'; }
-
 function switchAuthTab(tab) {
   document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
   if (tab === 'login') {
@@ -427,11 +286,11 @@ window.addEventListener('DOMContentLoaded', function() {
 async function handleLogin() {
   var u = document.getElementById('login-username').value.trim();
   var p = document.getElementById('login-password').value;
-  if (!u || !p) { alert('请填写完整'); return; }
+  if (!u || !p) { alert(t('fillAll')); return; }
   var res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: u, password: p }) });
   var data = await res.json();
   if (data.token) { localStorage.setItem('token', data.token); showLoggedIn(data.user); hideAuth(); }
-  else alert(data.error);
+  else alert(data.error || t('loginFailed'));
 }
 
 async function handleRegister() {
@@ -439,12 +298,12 @@ async function handleRegister() {
   var e = document.getElementById('reg-email').value.trim();
   var p = document.getElementById('reg-password').value;
   var c = document.getElementById('reg-confirm').value;
-  if (!u || !e || !p) { alert('请填写所有字段'); return; }
-  if (p !== c) { alert('两次密码不一致'); return; }
+  if (!u || !e || !p) { alert(t('fillAllFields')); return; }
+  if (p !== c) { alert(t('passwordMismatch')); return; }
   var res = await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: u, email: e, password: p }) });
   var data = await res.json();
   if (data.token) { localStorage.setItem('token', data.token); showLoggedIn(data.user); hideAuth(); }
-  else alert(data.error);
+  else alert(data.error || t('registerFailed'));
 }
 
 function handleLogout() { localStorage.clear(); showLoggedOut(); }
@@ -452,7 +311,7 @@ function handleLogout() { localStorage.clear(); showLoggedOut(); }
 function showLoggedIn(user) {
   document.getElementById('navRight').style.display = 'none';
   document.getElementById('navRightLogged').style.display = 'flex';
-  document.getElementById('navUserName').textContent = user.username + ' (' + (user.rating || 1000) + '分)';
+  document.getElementById('navUserName').textContent = user.username + ' (' + (user.rating || 1000) + ')';
 }
 
 function showLoggedOut() {
@@ -482,382 +341,118 @@ window.addEventListener('DOMContentLoaded', function() {
   let blackTime = INITIAL_TIME, whiteTime = INITIAL_TIME, timerInterval = null, timerActive = false;
   let hoverRow = -1, hoverCol = -1, animatingStone = null;
   const ANIM_DURATION = 200;
-
   let canvas, ctx, turnTextEl, moveCountEl, mainClockEl;
 
-  function formatTime(s) {
-    const m = Math.floor(Math.max(0, s) / 60), sec = Math.floor(Math.max(0, s) % 60);
-    return `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-  }
-
-  function showNotification(msg, dur = 3000) {
-    const n = document.createElement('div'); n.className = 'notification'; n.textContent = msg;
-    document.body.appendChild(n); setTimeout(() => { if (n.parentNode) n.remove(); }, dur);
-  }
-
-  function showModal(title, message, buttons = []) {
-    const m = document.createElement('div');
-    m.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:999;';
-    let bHTML = buttons.map(b => `<button id="${b.id||''}" style="margin:4px;padding:8px 16px;border-radius:6px;border:1px solid #8B6914;background:#fff;color:#8B6914;cursor:pointer;font-weight:bold;">${b.text}</button>`).join('');
-    m.innerHTML = `<div style="background:#fff;border-radius:12px;padding:24px;text-align:center;max-width:360px;width:90%;box-shadow:0 10px 40px rgba(0,0,0,0.2);"><h3 style="color:#333;margin-bottom:10px;">${title}</h3><p style="color:#888;margin-bottom:12px;">${message}</p>${bHTML}</div>`;
-    document.body.appendChild(m);
-    buttons.forEach(b => { if (b.id && b.onClick) { const el = document.getElementById(b.id); if (el) el.addEventListener('click', () => { b.onClick(); m.remove(); }); } });
+  function formatTime(s) { const m = Math.floor(Math.max(0,s)/60), sec = Math.floor(Math.max(0,s)%60); return m.toString().padStart(2,'0')+':'+sec.toString().padStart(2,'0'); }
+  function showNotification(msg, dur=3000) { const n = document.createElement('div'); n.className='notification'; n.textContent=msg; document.body.appendChild(n); setTimeout(()=>{if(n.parentNode)n.remove();}, dur); }
+  function showModal(title, message, buttons=[]) {
+    const m = document.createElement('div'); m.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:999;';
+    let bHTML = buttons.map(b=>`<button id="${b.id||''}" style="margin:4px;padding:8px 16px;border-radius:6px;border:1px solid #8B6914;background:#fff;color:#8B6914;cursor:pointer;font-weight:bold;">${b.text}</button>`).join('');
+    m.innerHTML=`<div style="background:#fff;border-radius:12px;padding:24px;text-align:center;max-width:360px;width:90%;box-shadow:0 10px 40px rgba(0,0,0,0.2);"><h3>${title}</h3><p style="color:#888;margin-bottom:12px;">${message}</p>${bHTML}</div>`;
+    document.body.appendChild(m); buttons.forEach(b=>{if(b.id&&b.onClick){const el=document.getElementById(b.id);if(el)el.addEventListener('click',()=>{b.onClick();m.remove();});}});
     return m;
   }
 
   function checkWin(row, col, player) {
-    if (board[row][col] !== player) return null;
-    const dirs = [[1,0],[0,1],[1,1],[1,-1]];
-    for (let [dx, dy] of dirs) {
-      let cells = [[row, col]];
-      for (let s = 1; s < 5; s++) { const r = row+dx*s, c = col+dy*s; if (r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===player) cells.push([r,c]); else break; }
-      for (let s = 1; s < 5; s++) { const r = row-dx*s, c = col-dy*s; if (r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===player) cells.unshift([r,c]); else break; }
-      if (cells.length >= 5) return cells;
-    }
+    if(board[row][col]!==player) return null;
+    const dirs=[[1,0],[0,1],[1,1],[1,-1]];
+    for(let[dx,dy]of dirs){let cells=[[row,col]];for(let s=1;s<5;s++){const r=row+dx*s,c=col+dy*s;if(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===player)cells.push([r,c]);else break;}for(let s=1;s<5;s++){const r=row-dx*s,c=col-dy*s;if(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===player)cells.unshift([r,c]);else break;}if(cells.length>=5)return cells;}
     return null;
   }
 
-  function isBoardFull() {
-    for (let r = 0; r < BOARD_SIZE; r++) for (let c = 0; c < BOARD_SIZE; c++) if (board[r][c] === EMPTY) return false;
-    return true;
+  function isBoardFull(){for(let r=0;r<BOARD_SIZE;r++)for(let c=0;c<BOARD_SIZE;c++)if(board[r][c]===EMPTY)return false;return true;}
+  function stopTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}timerActive=false;}
+  function startTimerIfNeeded(){
+    if(timerActive||winner||isDraw||gameMode===MODE_ONLINE||(gameMode===MODE_AI&&currentPlayer===aiColor))return;
+    timerActive=true;timerInterval=setInterval(()=>{if(winner||isDraw){stopTimer();return;}if(currentPlayer===BLACK){blackTime--;if(blackTime<=0){blackTime=0;winner=WHITE;stopTimer();updateUI();drawBoard();}}else{whiteTime--;if(whiteTime<=0){whiteTime=0;winner=BLACK;stopTimer();updateUI();drawBoard();}}updateClockDisplay();},1000);
   }
 
-  function stopTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } timerActive = false; }
+  function updateClockDisplay(){if(!mainClockEl)return;const t=currentPlayer===BLACK?blackTime:whiteTime;mainClockEl.textContent=formatTime(t);mainClockEl.style.color=(currentPlayer===BLACK?blackTime:whiteTime)<=30?'#e53e3e':'#8B6914';}
 
-  function startTimerIfNeeded() {
-    if (timerActive || winner || isDraw || gameMode === MODE_ONLINE || (gameMode === MODE_AI && currentPlayer === aiColor)) return;
-    timerActive = true;
-    timerInterval = setInterval(() => {
-      if (winner || isDraw) { stopTimer(); return; }
-      if (currentPlayer === BLACK) { blackTime--; if (blackTime <= 0) { blackTime = 0; winner = WHITE; stopTimer(); updateUI(); drawBoard(); } }
-      else { whiteTime--; if (whiteTime <= 0) { whiteTime = 0; winner = BLACK; stopTimer(); updateUI(); drawBoard(); } }
-      updateClockDisplay();
-    }, 1000);
-  }
-
-  function updateClockDisplay() {
-    if (!mainClockEl) return;
-    const t = currentPlayer === BLACK ? blackTime : whiteTime;
-    mainClockEl.textContent = formatTime(t);
-    mainClockEl.style.color = (currentPlayer === BLACK ? blackTime : whiteTime) <= 30 ? '#e53e3e' : '#8B6914';
-  }
-
-  if (socket) {
-    socket.on('connect', () => console.log('已连接'));
-    socket.on('privateRoomCreated', ({ roomId }) => {
-      currentRoomId = roomId; gameMode = MODE_ONLINE; updateModeButtons();
-      navigator.clipboard.writeText(`${window.location.origin}/room/${roomId}`).then(() => showNotification('✅ 邀请链接已复制！')).catch(() => showNotification('📋 房间号: ' + roomId));
-      document.getElementById('roomInfo').style.display = 'block'; document.getElementById('roomIdDisplay').textContent = roomId;
-    });
-    socket.on('joinedRoom', ({ roomId, color }) => {
-      currentRoomId = roomId; myColor = color === BLACK_STR ? BLACK : WHITE; gameMode = MODE_ONLINE;
-      updateModeButtons(); showNotification(`✅ 加入成功！执${color === BLACK_STR ? '⚫黑' : '⚪白'}`);
-      document.getElementById('roomInfo').style.display = 'block'; document.getElementById('roomIdDisplay').textContent = roomId;
-      updateUI();
-    });
-    socket.on('gameState', (gameState) => {
-      const prevWinner = winner;
-      board = gameState.board.map(row => row.map(cell => cell === BLACK_STR ? BLACK : cell === WHITE_STR ? WHITE : EMPTY));
-      currentPlayer = gameState.currentPlayer === BLACK_STR ? BLACK : WHITE;
-      winner = gameState.winner ? (gameState.winner === BLACK_STR ? BLACK : WHITE) : null;
-      winningCells = gameState.winningCells || []; moveCount = gameState.moveCount; isDraw = gameState.isDraw;
-      if (gameState.timers) { blackTime = gameState.timers.black; whiteTime = gameState.timers.white; }
-      isMyTurn = (currentPlayer === myColor);
-      updateUI(); drawBoard();
-      if (myColor && (winner || isDraw) && !prevWinner && !gameState._statsUpdated) {
-        gameState._statsUpdated = true;
-        const token = localStorage.getItem('token');
-        if (token) {
-          let result = winner === myColor ? 'win' : (winner && winner !== myColor ? 'loss' : 'draw');
-          if (result) fetch('/api/update-stats', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ result }) })
-            .then(r => r.json()).then(data => {
-              if (data.stats) {
-                document.getElementById('navUserName').textContent = data.stats.username ? data.stats.username + ' (' + data.stats.rating + '分)' : (data.stats.rating + '分');
-              }
-            });
-        }
+  if(socket){
+    socket.on('connect',()=>console.log('connected'));
+    socket.on('privateRoomCreated',({roomId})=>{currentRoomId=roomId;gameMode=MODE_ONLINE;updateModeButtons();navigator.clipboard.writeText(`${window.location.origin}/room/${roomId}`).then(()=>showNotification(t('inviteCopied'))).catch(()=>showNotification(t('roomNumber')+roomId));document.getElementById('roomInfo').style.display='block';document.getElementById('roomIdDisplay').textContent=roomId;});
+    socket.on('joinedRoom',({roomId,color})=>{currentRoomId=roomId;myColor=color===BLACK_STR?BLACK:WHITE;gameMode=MODE_ONLINE;updateModeButtons();showNotification(t('joined')+(color===BLACK_STR?'⚫黑':'⚪白'));document.getElementById('roomInfo').style.display='block';document.getElementById('roomIdDisplay').textContent=roomId;updateUI();});
+    socket.on('gameState',(gameState)=>{
+      const prevWinner=winner;
+      board=gameState.board.map(row=>row.map(cell=>cell===BLACK_STR?BLACK:cell===WHITE_STR?WHITE:EMPTY));
+      currentPlayer=gameState.currentPlayer===BLACK_STR?BLACK:WHITE;
+      winner=gameState.winner?(gameState.winner===BLACK_STR?BLACK:WHITE):null;
+      winningCells=gameState.winningCells||[];moveCount=gameState.moveCount;isDraw=gameState.isDraw;
+      if(gameState.timers){blackTime=gameState.timers.black;whiteTime=gameState.timers.white;}
+      isMyTurn=(currentPlayer===myColor);updateUI();drawBoard();
+      if(myColor&&(winner||isDraw)&&!prevWinner&&!gameState._statsUpdated){
+        gameState._statsUpdated=true;const token=localStorage.getItem('token');
+        if(token){let result=winner===myColor?'win':(winner&&winner!==myColor?'loss':'draw');
+        if(result)fetch('/api/update-stats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({result})}).then(r=>r.json()).then(data=>{if(data.stats)document.getElementById('navUserName').textContent=(data.stats.username||'')+'('+data.stats.rating+')';});}
       }
     });
-    socket.on('undoRequest', () => showModal('悔棋请求', '对手请求悔棋', [
-      { text: '同意', id: 'aUndo', onClick: () => socket.emit('acceptUndo', { roomId: currentRoomId }) },
-      { text: '拒绝', id: 'rUndo', onClick: () => socket.emit('rejectUndo', { roomId: currentRoomId }) }
-    ]));
-    socket.on('undoRejected', () => showNotification('悔棋被拒绝'));
-    socket.on('playerDisconnected', ({ message }) => { showNotification('⚠️ ' + message); if (myColor) { winner = myColor; updateUI(); drawBoard(); } });
-    socket.on('error', ({ message }) => showNotification('⚠️ ' + message));
+    socket.on('undoRequest',()=>showModal(t('undoRequest'),t('undoRequestMsg'),[{text:t('accept'),id:'aUndo',onClick:()=>socket.emit('acceptUndo',{roomId:currentRoomId})},{text:t('reject'),id:'rUndo',onClick:()=>socket.emit('rejectUndo',{roomId:currentRoomId})}]));
+    socket.on('undoRejected',()=>showNotification(t('undoRejected')));
+    socket.on('playerDisconnected',({message})=>{showNotification('⚠️ '+message);if(myColor){winner=myColor;updateUI();drawBoard();}});
+    socket.on('error',({message})=>showNotification('⚠️ '+message));
   }
 
-  // AI
-  function getNearbyEmptyCells(radius = 2) {
-    const set = new Set();
-    for (let r = 0; r < BOARD_SIZE; r++) for (let c = 0; c < BOARD_SIZE; c++) if (board[r][c] !== EMPTY)
-      for (let dr = -radius; dr <= radius; dr++) for (let dc = -radius; dc <= radius; dc++) {
-        const nr = r+dr, nc = c+dc;
-        if (nr>=0&&nr<BOARD_SIZE&&nc>=0&&nc<BOARD_SIZE&&board[nr][nc]===EMPTY) set.add(`${nr},${nc}`);
-      }
-    return set.size ? Array.from(set).map(s => s.split(',').map(Number)) : [[7,7]];
-  }
+  // AI (unchanged)
+  function getNearbyEmptyCells(radius=2){const set=new Set();for(let r=0;r<BOARD_SIZE;r++)for(let c=0;c<BOARD_SIZE;c++)if(board[r][c]!==EMPTY)for(let dr=-radius;dr<=radius;dr++)for(let dc=-radius;dc<=radius;dc++){const nr=r+dr,nc=c+dc;if(nr>=0&&nr<BOARD_SIZE&&nc>=0&&nc<BOARD_SIZE&&board[nr][nc]===EMPTY)set.add(`${nr},${nc}`);}return set.size?Array.from(set).map(s=>s.split(',').map(Number)):[[7,7]];}
+  function evaluatePosition(row,col,player){let score=0;board[row][col]=player;const dirs=[[1,0],[0,1],[1,1],[1,-1]];for(let[dx,dy]of dirs){let count=1,openEnds=0,r=row+dx,c=col+dy;while(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===player){count++;r+=dx;c+=dy;}if(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===EMPTY)openEnds++;r=row-dx;c=col-dy;while(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===player){count++;r-=dx;c-=dy;}if(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===EMPTY)openEnds++;if(count>=5)score+=100000;else if(count===4)score+=openEnds===2?10000:openEnds===1?3000:0;else if(count===3)score+=openEnds===2?2000:openEnds===1?800:0;else if(count===2)score+=openEnds===2?400:openEnds===1?100:0;else if(count===1)score+=10;}board[row][col]=EMPTY;return score;}
+  function evaluateDefense(row,col,player){const opp=player===BLACK?WHITE:BLACK;let score=0;board[row][col]=opp;const dirs=[[1,0],[0,1],[1,1],[1,-1]];for(let[dx,dy]of dirs){let count=1,openEnds=0,r=row+dx,c=col+dy;while(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===opp){count++;r+=dx;c+=dy;}if(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===EMPTY)openEnds++;r=row-dx;c=col-dy;while(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===opp){count++;r-=dx;c-=dy;}if(r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===EMPTY)openEnds++;if(count>=5)score+=80000;else if(count===4&&openEnds>=1)score+=8000;else if(count===3&&openEnds===2)score+=1500;}board[row][col]=EMPTY;return score;}
+  function aiMove(){if(winner||isDraw){isAiThinking=false;updateUI();return;}const candidates=getNearbyEmptyCells(2);let bestScore=-Infinity,bestMoves=[];for(let[r,c]of candidates){let score=evaluatePosition(r,c,aiColor)*1.2+evaluateDefense(r,c,aiColor)*1.1+evaluatePosition(r,c,aiColor===BLACK?WHITE:BLACK)*0.3+(14-Math.abs(r-7)-Math.abs(c-7))*5;if(score>bestScore){bestScore=score;bestMoves=[[r,c]];}else if(score===bestScore)bestMoves.push([r,c]);}isAiThinking=false;if(bestMoves.length)placeStoneLocal(bestMoves[0][0],bestMoves[0][1]);}
 
-  function evaluatePosition(row, col, player) {
-    let score = 0; board[row][col] = player;
-    const dirs = [[1,0],[0,1],[1,1],[1,-1]];
-    for (let [dx, dy] of dirs) {
-      let count = 1, openEnds = 0, r = row+dx, c = col+dy;
-      while (r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===player) { count++; r+=dx; c+=dy; }
-      if (r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===EMPTY) openEnds++;
-      r = row-dx; c = col-dy;
-      while (r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===player) { count++; r-=dx; c-=dy; }
-      if (r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===EMPTY) openEnds++;
-      if (count >= 5) score += 100000;
-      else if (count === 4) score += openEnds === 2 ? 10000 : openEnds === 1 ? 3000 : 0;
-      else if (count === 3) score += openEnds === 2 ? 2000 : openEnds === 1 ? 800 : 0;
-      else if (count === 2) score += openEnds === 2 ? 400 : openEnds === 1 ? 100 : 0;
-      else if (count === 1) score += 10;
-    }
-    board[row][col] = EMPTY; return score;
-  }
+  function resetGame(){if(gameMode===MODE_ONLINE&&currentRoomId&&socket){socket.emit('leaveRoom',{roomId:currentRoomId});currentRoomId=null;myColor=null;}stopTimer();board=Array(BOARD_SIZE).fill().map(()=>Array(BOARD_SIZE).fill(EMPTY));currentPlayer=BLACK;winner=null;winningCells=[];historyStack=[];moveCount=0;isDraw=false;blackTime=INITIAL_TIME;whiteTime=INITIAL_TIME;timerActive=false;hoverRow=-1;hoverCol=-1;isMyTurn=true;isAiThinking=false;animatingStone=null;document.getElementById('roomInfo').style.display='none';updateModeButtons();updateUI();drawBoard();if(gameMode===MODE_AI&&aiColor===BLACK)setTimeout(()=>aiMove(),300);}
+  function undoMove(){if(isAiThinking)return;if(gameMode===MODE_ONLINE&&currentRoomId&&socket){socket.emit('requestUndo',{roomId:currentRoomId});showNotification(t('undoSent'));}else if(gameMode===MODE_AI&&historyStack.length>=2&&!winner&&!isDraw){for(let i=0;i<2;i++){const last=historyStack.pop();board=last.board.map(r=>[...r]);currentPlayer=last.player;moveCount=last.moveCount;}updateUI();drawBoard();}else if(gameMode===MODE_PVP&&historyStack.length>0&&!winner&&!isDraw){const last=historyStack.pop();board=last.board.map(r=>[...r]);currentPlayer=last.player;moveCount=last.moveCount;updateUI();drawBoard();}}
+  function placeStoneLocal(row,col){if(board[row][col]!==EMPTY||winner||isDraw)return;historyStack.push({board:board.map(r=>[...r]),player:currentPlayer,moveCount});board[row][col]=currentPlayer;moveCount++;animatingStone={row,col,startTime:performance.now()};const winResult=checkWin(row,col,currentPlayer);if(winResult){winner=currentPlayer;winningCells=winResult;stopTimer();updateUI();drawBoard();return;}if(isBoardFull()){isDraw=true;stopTimer();updateUI();drawBoard();return;}currentPlayer=currentPlayer===BLACK?WHITE:BLACK;startTimerIfNeeded();updateUI();drawBoard();if(gameMode===MODE_AI&&currentPlayer===aiColor&&!winner&&!isDraw)setTimeout(()=>aiMove(),50);}
+  function placeStone(row,col){if(gameMode===MODE_ONLINE){if(!isMyTurn||winner||isDraw||!currentRoomId||!socket)return;socket.emit('makeMove',{roomId:currentRoomId,row,col});}else placeStoneLocal(row,col);}
+  function createPrivateRoom(){if(!socket)return showNotification(t('notConnected'));socket.emit('createPrivateRoom');}
+  function joinMatchmaking(){if(!socket)return showNotification(t('notConnected'));socket.emit('joinMatchmaking',{color:playerColor===BLACK?BLACK_STR:WHITE_STR});}
 
-  function evaluateDefense(row, col, player) {
-    const opp = player === BLACK ? WHITE : BLACK;
-    let score = 0; board[row][col] = opp;
-    const dirs = [[1,0],[0,1],[1,1],[1,-1]];
-    for (let [dx, dy] of dirs) {
-      let count = 1, openEnds = 0, r = row+dx, c = col+dy;
-      while (r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===opp) { count++; r+=dx; c+=dy; }
-      if (r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===EMPTY) openEnds++;
-      r = row-dx; c = col-dy;
-      while (r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===opp) { count++; r-=dx; c-=dy; }
-      if (r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[r][c]===EMPTY) openEnds++;
-      if (count >= 5) score += 80000;
-      else if (count === 4 && openEnds >= 1) score += 8000;
-      else if (count === 3 && openEnds === 2) score += 1500;
-    }
-    board[row][col] = EMPTY; return score;
-  }
-
-  function aiMove() {
-    if (winner || isDraw) { isAiThinking = false; updateUI(); return; }
-    const candidates = getNearbyEmptyCells(2);
-    let bestScore = -Infinity, bestMoves = [];
-    for (let [r, c] of candidates) {
-      let score = evaluatePosition(r, c, aiColor) * 1.2 + evaluateDefense(r, c, aiColor) * 1.1 + evaluatePosition(r, c, aiColor === BLACK ? WHITE : BLACK) * 0.3 + (14 - Math.abs(r-7) - Math.abs(c-7)) * 5;
-      if (score > bestScore) { bestScore = score; bestMoves = [[r, c]]; }
-      else if (score === bestScore) bestMoves.push([r, c]);
-    }
-    isAiThinking = false;
-    if (bestMoves.length) placeStoneLocal(bestMoves[0][0], bestMoves[0][1]);
-  }
-
-  function resetGame() {
-    if (gameMode === MODE_ONLINE && currentRoomId && socket) { socket.emit('leaveRoom', { roomId: currentRoomId }); currentRoomId = null; myColor = null; }
-    stopTimer();
-    board = Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(EMPTY));
-    currentPlayer = BLACK; winner = null; winningCells = []; historyStack = []; moveCount = 0; isDraw = false;
-    blackTime = INITIAL_TIME; whiteTime = INITIAL_TIME; timerActive = false;
-    hoverRow = -1; hoverCol = -1; isMyTurn = true; isAiThinking = false; animatingStone = null;
-    document.getElementById('roomInfo').style.display = 'none';
-    updateModeButtons(); updateUI(); drawBoard();
-    if (gameMode === MODE_AI && aiColor === BLACK) setTimeout(() => aiMove(), 300);
-  }
-
-  function undoMove() {
-    if (isAiThinking) return;
-    if (gameMode === MODE_ONLINE && currentRoomId && socket) { socket.emit('requestUndo', { roomId: currentRoomId }); showNotification('已发送悔棋请求'); }
-    else if (gameMode === MODE_AI && historyStack.length >= 2 && !winner && !isDraw) {
-      for (let i = 0; i < 2; i++) { const last = historyStack.pop(); board = last.board.map(r => [...r]); currentPlayer = last.player; moveCount = last.moveCount; }
-      updateUI(); drawBoard();
-    } else if (gameMode === MODE_PVP && historyStack.length > 0 && !winner && !isDraw) {
-      const last = historyStack.pop(); board = last.board.map(r => [...r]); currentPlayer = last.player; moveCount = last.moveCount;
-      updateUI(); drawBoard();
-    }
-  }
-
-  function placeStoneLocal(row, col) {
-    if (board[row][col] !== EMPTY || winner || isDraw) return;
-    historyStack.push({ board: board.map(r => [...r]), player: currentPlayer, moveCount });
-    board[row][col] = currentPlayer; moveCount++;
-    animatingStone = { row, col, startTime: performance.now() };
-    const winResult = checkWin(row, col, currentPlayer);
-    if (winResult) { winner = currentPlayer; winningCells = winResult; stopTimer(); updateUI(); drawBoard(); return; }
-    if (isBoardFull()) { isDraw = true; stopTimer(); updateUI(); drawBoard(); return; }
-    currentPlayer = currentPlayer === BLACK ? WHITE : BLACK;
-    startTimerIfNeeded(); updateUI(); drawBoard();
-    if (gameMode === MODE_AI && currentPlayer === aiColor && !winner && !isDraw) setTimeout(() => aiMove(), 50);
-  }
-
-  function placeStone(row, col) {
-    if (gameMode === MODE_ONLINE) { if (!isMyTurn || winner || isDraw || !currentRoomId || !socket) return; socket.emit('makeMove', { roomId: currentRoomId, row, col }); }
-    else placeStoneLocal(row, col);
-  }
-
-  function createPrivateRoom() { if (!socket) return showNotification('未连接'); socket.emit('createPrivateRoom'); }
-  function joinMatchmaking() { if (!socket) return showNotification('未连接'); socket.emit('joinMatchmaking', { color: playerColor === BLACK ? BLACK_STR : WHITE_STR }); }
-
-  function updateUI() {
-    if (!turnTextEl) return;
-    let txt;
-    if (winner) { txt = `🏆 ${winner === BLACK ? '黑方' : '白方'} 获胜！`; turnTextEl.style.color = '#8B6914'; }
-    else if (isDraw) { txt = '🤝 平局'; turnTextEl.style.color = '#888'; }
-    else { txt = `${currentPlayer === BLACK ? '⚫ 黑方' : '⚪ 白方'} 回合${gameMode === MODE_ONLINE ? (isMyTurn ? ' (你)' : ' (对手)') : ''}`; turnTextEl.style.color = '#333'; }
-    turnTextEl.textContent = txt;
-    if (moveCountEl) moveCountEl.textContent = `步数 ${moveCount}`;
+  function updateUI(){
+    if(!turnTextEl)return;let txt;
+    if(winner){txt=winner===BLACK?t('blackWins'):t('whiteWins');turnTextEl.style.color='#8B6914';}
+    else if(isDraw){txt=t('draw');turnTextEl.style.color='#888';}
+    else{txt=(currentPlayer===BLACK?t('black'):t('white'))+' '+(gameMode===MODE_ONLINE?(isMyTurn?t('yourTurn'):t('opponentTurn')):'');turnTextEl.style.color='#333';}
+    turnTextEl.textContent=txt;
+    if(moveCountEl)moveCountEl.textContent=t('moves')+' '+moveCount;
     updateClockDisplay();
-    document.getElementById('blackName').textContent = gameMode === MODE_ONLINE ? (myColor === BLACK ? '😎 你(黑)' : '对手(黑)') : '⚫ 黑方';
-    document.getElementById('whiteName').textContent = gameMode === MODE_ONLINE ? (myColor === WHITE ? '😎 你(白)' : '对手(白)') : '⚪ 白方';
-    document.getElementById('blackInfo').textContent = currentPlayer === BLACK && !winner && !isDraw ? '⏳ 思考中' : '';
-    document.getElementById('whiteInfo').textContent = currentPlayer === WHITE && !winner && !isDraw ? '⏳ 思考中' : '';
+    document.getElementById('blackName').textContent=gameMode===MODE_ONLINE?(myColor===BLACK?t('youBlack'):t('opponentBlack')):t('black');
+    document.getElementById('whiteName').textContent=gameMode===MODE_ONLINE?(myColor===WHITE?t('youWhite'):t('opponentWhite')):t('white');
+    document.getElementById('blackInfo').textContent=currentPlayer===BLACK&&!winner&&!isDraw?t('thinking'):'';
+    document.getElementById('whiteInfo').textContent=currentPlayer===WHITE&&!winner&&!isDraw?t('thinking'):'';
   }
 
-  function updateModeButtons() {
-    document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === gameMode));
-    document.getElementById('onlineControls').style.display = gameMode === MODE_ONLINE ? 'flex' : 'none';
-    document.getElementById('aiSettings').style.display = gameMode === MODE_AI ? 'flex' : 'none';
+  function updateModeButtons(){document.querySelectorAll('.mode-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===gameMode));document.getElementById('onlineControls').style.display=gameMode===MODE_ONLINE?'flex':'none';document.getElementById('aiSettings').style.display=gameMode===MODE_AI?'flex':'none';}
+
+  function drawBoard(){
+    if(!ctx)return;ctx.clearRect(0,0,CANVAS_SIZE,CANVAS_SIZE);
+    ctx.fillStyle='#e8d5a3';ctx.beginPath();ctx.roundRect(0,0,CANVAS_SIZE,CANVAS_SIZE,14);ctx.fill();
+    ctx.strokeStyle='#5a4a2a';ctx.lineWidth=1;
+    for(let i=0;i<BOARD_SIZE;i++){const pos=PADDING+i*CELL_SIZE;ctx.beginPath();ctx.moveTo(PADDING,pos);ctx.lineTo(PADDING+(BOARD_SIZE-1)*CELL_SIZE,pos);ctx.stroke();ctx.beginPath();ctx.moveTo(pos,PADDING);ctx.lineTo(pos,PADDING+(BOARD_SIZE-1)*CELL_SIZE);ctx.stroke();}
+    const starPoints=[[3,3],[3,11],[7,7],[11,3],[11,11]];
+    for(let[r,c]of starPoints){const x=PADDING+c*CELL_SIZE,y=PADDING+r*CELL_SIZE;ctx.fillStyle='#5a4a2a';ctx.beginPath();ctx.arc(x,y,3.5,0,Math.PI*2);ctx.fill();}
+    let lastMoveRow=-1,lastMoveCol=-1;
+    if(historyStack.length>0){const pb=historyStack[historyStack.length-1].board;for(let r=0;r<BOARD_SIZE;r++)for(let c=0;c<BOARD_SIZE;c++)if(board[r][c]!==EMPTY&&pb[r][c]===EMPTY){lastMoveRow=r;lastMoveCol=c;}}
+    for(let r=0;r<BOARD_SIZE;r++){for(let c=0;c<BOARD_SIZE;c++){const stone=board[r][c];if(stone===EMPTY)continue;const x=PADDING+c*CELL_SIZE,y=PADDING+r*CELL_SIZE,radius=CELL_SIZE*0.43;const isWinStone=winningCells?.some(([wr,wc])=>wr===r&&wc===c);const isLastMove=(r===lastMoveRow&&c===lastMoveCol);let scale=1;if(animatingStone?.row===r&&animatingStone?.col===c){const elapsed=performance.now()-animatingStone.startTime;if(elapsed<ANIM_DURATION){const t=elapsed/ANIM_DURATION,c1=1.70158,c3=c1+1;scale=Math.max(0,Math.min(1,1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2)));requestAnimationFrame(drawBoard);}else animatingStone=null;}const dr=radius*scale;ctx.save();ctx.shadowColor='rgba(0,0,0,0.4)';ctx.shadowBlur=4;ctx.shadowOffsetX=1;ctx.shadowOffsetY=2;const g=ctx.createRadialGradient(x-dr*0.25,y-dr*0.3,dr*0.05,x,y,dr);if(stone===BLACK){g.addColorStop(0,'#555');g.addColorStop(0.5,'#1a1a1a');g.addColorStop(1,'#000');}else{g.addColorStop(0,'#fff');g.addColorStop(0.4,'#f0f0f0');g.addColorStop(1,'#ccc');}ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,dr,0,Math.PI*2);ctx.fill();ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetX=0;ctx.shadowOffsetY=0;ctx.fillStyle=stone===BLACK?'rgba(255,255,255,0.15)':'rgba(255,255,255,0.7)';ctx.beginPath();ctx.arc(x-dr*0.3,y-dr*0.35,dr*0.2,0,Math.PI*2);ctx.fill();ctx.restore();if(isWinStone){ctx.save();ctx.shadowColor='#fbbf24';ctx.shadowBlur=12;ctx.strokeStyle='#f59e0b';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,dr+2,0,Math.PI*2);ctx.stroke();ctx.restore();}if(isLastMove&&!winner&&!isDraw){ctx.save();ctx.fillStyle='#ef4444';ctx.shadowColor='#ef4444';ctx.shadowBlur=4;ctx.beginPath();ctx.arc(x,y,dr*0.18,0,Math.PI*2);ctx.fill();ctx.restore();}}}
+    const canPlace=gameMode!==MODE_ONLINE||isMyTurn;if(!winner&&!isDraw&&!isAiThinking&&canPlace&&hoverRow>=0&&hoverCol>=0&&board[hoverRow][hoverCol]===EMPTY){const x=PADDING+hoverCol*CELL_SIZE,y=PADDING+hoverRow*CELL_SIZE,r=CELL_SIZE*0.43;ctx.globalAlpha=0.35;ctx.fillStyle=currentPlayer===BLACK?'#333':'#ddd';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
   }
 
-  function drawBoard() {
-    if (!ctx) return;
-    ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-    ctx.fillStyle = '#e8d5a3';
-    ctx.beginPath(); ctx.roundRect(0, 0, CANVAS_SIZE, CANVAS_SIZE, 14); ctx.fill();
-    ctx.strokeStyle = '#5a4a2a'; ctx.lineWidth = 1;
-    for (let i = 0; i < BOARD_SIZE; i++) {
-      const pos = PADDING + i*CELL_SIZE;
-      ctx.beginPath(); ctx.moveTo(PADDING, pos); ctx.lineTo(PADDING + (BOARD_SIZE-1)*CELL_SIZE, pos); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(pos, PADDING); ctx.lineTo(pos, PADDING + (BOARD_SIZE-1)*CELL_SIZE); ctx.stroke();
-    }
-    const starPoints = [[3,3],[3,11],[7,7],[11,3],[11,11]];
-    for (let [r, c] of starPoints) {
-      const x = PADDING + c*CELL_SIZE, y = PADDING + r*CELL_SIZE;
-      ctx.fillStyle = '#5a4a2a'; ctx.beginPath(); ctx.arc(x, y, 3.5, 0, Math.PI*2); ctx.fill();
-    }
-    let lastMoveRow = -1, lastMoveCol = -1;
-    if (historyStack.length > 0) {
-      const pb = historyStack[historyStack.length-1].board;
-      for (let r = 0; r < BOARD_SIZE; r++) for (let c = 0; c < BOARD_SIZE; c++) if (board[r][c] !== EMPTY && pb[r][c] === EMPTY) { lastMoveRow = r; lastMoveCol = c; }
-    }
-    for (let r = 0; r < BOARD_SIZE; r++) {
-      for (let c = 0; c < BOARD_SIZE; c++) {
-        const stone = board[r][c]; if (stone === EMPTY) continue;
-        const x = PADDING + c*CELL_SIZE, y = PADDING + r*CELL_SIZE, radius = CELL_SIZE*0.43;
-        const isWinStone = winningCells?.some(([wr, wc]) => wr===r && wc===c);
-        const isLastMove = (r===lastMoveRow && c===lastMoveCol);
-        let scale = 1;
-        if (animatingStone?.row===r && animatingStone?.col===c) {
-          const elapsed = performance.now() - animatingStone.startTime;
-          if (elapsed < ANIM_DURATION) {
-            const t = elapsed/ANIM_DURATION, c1=1.70158, c3=c1+1;
-            scale = Math.max(0, Math.min(1, 1 + c3*Math.pow(t-1,3) + c1*Math.pow(t-1,2)));
-            requestAnimationFrame(drawBoard);
-          } else animatingStone = null;
-        }
-        const dr = radius * scale;
-        ctx.save(); ctx.shadowColor='rgba(0,0,0,0.4)'; ctx.shadowBlur=4; ctx.shadowOffsetX=1; ctx.shadowOffsetY=2;
-        const g = ctx.createRadialGradient(x-dr*0.25, y-dr*0.3, dr*0.05, x, y, dr);
-        if (stone===BLACK) { g.addColorStop(0,'#555'); g.addColorStop(0.5,'#1a1a1a'); g.addColorStop(1,'#000'); }
-        else { g.addColorStop(0,'#fff'); g.addColorStop(0.4,'#f0f0f0'); g.addColorStop(1,'#ccc'); }
-        ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x, y, dr, 0, Math.PI*2); ctx.fill();
-        ctx.shadowColor='transparent'; ctx.shadowBlur=0; ctx.shadowOffsetX=0; ctx.shadowOffsetY=0;
-        ctx.fillStyle=stone===BLACK?'rgba(255,255,255,0.15)':'rgba(255,255,255,0.7)';
-        ctx.beginPath(); ctx.arc(x-dr*0.3, y-dr*0.35, dr*0.2, 0, Math.PI*2); ctx.fill();
-        ctx.restore();
-        if (isWinStone) {
-          ctx.save(); ctx.shadowColor='#fbbf24'; ctx.shadowBlur=12; ctx.strokeStyle='#f59e0b'; ctx.lineWidth=2;
-          ctx.beginPath(); ctx.arc(x, y, dr+2, 0, Math.PI*2); ctx.stroke(); ctx.restore();
-        }
-        if (isLastMove && !winner && !isDraw) {
-          ctx.save(); ctx.fillStyle='#ef4444'; ctx.shadowColor='#ef4444'; ctx.shadowBlur=4;
-          ctx.beginPath(); ctx.arc(x, y, dr*0.18, 0, Math.PI*2); ctx.fill(); ctx.restore();
-        }
-      }
-    }
-    const canPlace = gameMode !== MODE_ONLINE || isMyTurn;
-    if (!winner && !isDraw && !isAiThinking && canPlace && hoverRow>=0 && hoverCol>=0 && board[hoverRow][hoverCol]===EMPTY) {
-      const x = PADDING+hoverCol*CELL_SIZE, y = PADDING+hoverRow*CELL_SIZE, r = CELL_SIZE*0.43;
-      ctx.globalAlpha=0.35;
-      ctx.fillStyle=currentPlayer===BLACK?'#333':'#ddd';
-      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
-      ctx.globalAlpha=1;
-    }
-  }
+  function getBoardRowCol(cx,cy){const rect=canvas.getBoundingClientRect(),sx=CANVAS_SIZE/rect.width,sy=CANVAS_SIZE/rect.height;const canX=(cx-rect.left)*sx,canY=(cy-rect.top)*sy;const col=Math.round((canX-PADDING)/CELL_SIZE),row=Math.round((canY-PADDING)/CELL_SIZE);return(row>=0&&row<BOARD_SIZE&&col>=0&&col<BOARD_SIZE)?{row,col}:null;}
+  function setupEvents(){if(!canvas)return;canvas.addEventListener('click',(e)=>{if(isAiThinking)return;if(gameMode===MODE_ONLINE&&!isMyTurn)return;if(gameMode===MODE_AI&&currentPlayer!==playerColor)return;const pos=getBoardRowCol(e.clientX,e.clientY);if(pos)placeStone(pos.row,pos.col);});canvas.addEventListener('mousemove',(e)=>{const pos=getBoardRowCol(e.clientX,e.clientY);const can=gameMode===MODE_PVP||(gameMode===MODE_AI&&currentPlayer===playerColor&&!isAiThinking)||(gameMode===MODE_ONLINE&&isMyTurn);if(pos&&board[pos.row][pos.col]===EMPTY&&!winner&&!isDraw&&can){if(hoverRow!==pos.row||hoverCol!==pos.col){hoverRow=pos.row;hoverCol=pos.col;drawBoard();}}else{if(hoverRow!==-1||hoverCol!==-1){hoverRow=-1;hoverCol=-1;drawBoard();}}});canvas.addEventListener('mouseleave',()=>{if(hoverRow!==-1||hoverCol!==-1){hoverRow=-1;hoverCol=-1;drawBoard();}});}
+  function switchMode(mode){if(mode===gameMode)return;if(gameMode===MODE_ONLINE&&currentRoomId&&socket)socket.emit('leaveRoom',{roomId:currentRoomId});stopTimer();currentRoomId=null;myColor=null;isMyTurn=true;gameMode=mode;isAiThinking=false;playerColor=BLACK;aiColor=WHITE;board=Array(BOARD_SIZE).fill().map(()=>Array(BOARD_SIZE).fill(EMPTY));currentPlayer=BLACK;winner=null;winningCells=[];historyStack=[];moveCount=0;isDraw=false;blackTime=INITIAL_TIME;whiteTime=INITIAL_TIME;timerActive=false;hoverRow=-1;hoverCol=-1;animatingStone=null;document.getElementById('roomInfo').style.display='none';document.querySelectorAll('.color-dot').forEach(o=>o.classList.toggle('sel',parseInt(o.dataset.color)===BLACK));updateModeButtons();updateUI();drawBoard();if(gameMode===MODE_AI&&aiColor===BLACK)setTimeout(()=>aiMove(),300);}
+  function setPlayerColor(color){if(color===playerColor||isAiThinking)return;playerColor=color;aiColor=color===BLACK?WHITE:BLACK;document.querySelectorAll('.color-dot').forEach(o=>o.classList.toggle('sel',parseInt(o.dataset.color)===color));board=Array(BOARD_SIZE).fill().map(()=>Array(BOARD_SIZE).fill(EMPTY));currentPlayer=BLACK;winner=null;winningCells=[];historyStack=[];moveCount=0;isDraw=false;blackTime=INITIAL_TIME;whiteTime=INITIAL_TIME;stopTimer();hoverRow=-1;hoverCol=-1;isAiThinking=false;animatingStone=null;updateUI();drawBoard();if(aiColor===BLACK)setTimeout(()=>aiMove(),300);}
 
-  function getBoardRowCol(cx, cy) {
-    const rect = canvas.getBoundingClientRect(), sx = CANVAS_SIZE/rect.width, sy = CANVAS_SIZE/rect.height;
-    const canX = (cx-rect.left)*sx, canY = (cy-rect.top)*sy;
-    const col = Math.round((canX-PADDING)/CELL_SIZE), row = Math.round((canY-PADDING)/CELL_SIZE);
-    return (row>=0&&row<BOARD_SIZE&&col>=0&&col<BOARD_SIZE) ? { row, col } : null;
-  }
-
-  function setupEvents() {
-    if (!canvas) return;
-    canvas.addEventListener('click', (e) => {
-      if (isAiThinking) return;
-      if (gameMode===MODE_ONLINE && !isMyTurn) return;
-      if (gameMode===MODE_AI && currentPlayer!==playerColor) return;
-      const pos = getBoardRowCol(e.clientX, e.clientY); if (pos) placeStone(pos.row, pos.col);
-    });
-    canvas.addEventListener('mousemove', (e) => {
-      const pos = getBoardRowCol(e.clientX, e.clientY);
-      const can = gameMode===MODE_PVP || (gameMode===MODE_AI&&currentPlayer===playerColor&&!isAiThinking) || (gameMode===MODE_ONLINE&&isMyTurn);
-      if (pos && board[pos.row][pos.col]===EMPTY && !winner && !isDraw && can) {
-        if (hoverRow!==pos.row||hoverCol!==pos.col) { hoverRow=pos.row; hoverCol=pos.col; drawBoard(); }
-      } else { if (hoverRow!==-1||hoverCol!==-1) { hoverRow=-1; hoverCol=-1; drawBoard(); } }
-    });
-    canvas.addEventListener('mouseleave', () => { if (hoverRow!==-1||hoverCol!==-1) { hoverRow=-1; hoverCol=-1; drawBoard(); } });
-  }
-
-  function switchMode(mode) {
-    if (mode === gameMode) return;
-    if (gameMode===MODE_ONLINE && currentRoomId && socket) socket.emit('leaveRoom', { roomId: currentRoomId });
-    stopTimer(); currentRoomId=null; myColor=null; isMyTurn=true; gameMode=mode; isAiThinking=false;
-    playerColor=BLACK; aiColor=WHITE;
-    board=Array(BOARD_SIZE).fill().map(()=>Array(BOARD_SIZE).fill(EMPTY));
-    currentPlayer=BLACK; winner=null; winningCells=[]; historyStack=[]; moveCount=0; isDraw=false;
-    blackTime=INITIAL_TIME; whiteTime=INITIAL_TIME; timerActive=false; hoverRow=-1; hoverCol=-1; animatingStone=null;
-    document.getElementById('roomInfo').style.display='none';
-    document.querySelectorAll('.color-dot').forEach(o=>o.classList.toggle('sel', parseInt(o.dataset.color)===BLACK));
-    updateModeButtons(); updateUI(); drawBoard();
-    if (gameMode===MODE_AI && aiColor===BLACK) setTimeout(()=>aiMove(), 300);
-  }
-
-  function setPlayerColor(color) {
-    if (color===playerColor||isAiThinking) return;
-    playerColor=color; aiColor=color===BLACK?WHITE:BLACK;
-    document.querySelectorAll('.color-dot').forEach(o=>o.classList.toggle('sel', parseInt(o.dataset.color)===color));
-    board=Array(BOARD_SIZE).fill().map(()=>Array(BOARD_SIZE).fill(EMPTY));
-    currentPlayer=BLACK; winner=null; winningCells=[]; historyStack=[]; moveCount=0; isDraw=false;
-    blackTime=INITIAL_TIME; whiteTime=INITIAL_TIME; stopTimer(); hoverRow=-1; hoverCol=-1; isAiThinking=false; animatingStone=null;
-    updateUI(); drawBoard();
-    if (aiColor===BLACK) setTimeout(()=>aiMove(), 300);
-  }
-
-  // 初始化
-  canvas = document.getElementById('boardCanvas');
-  canvas.width = CANVAS_SIZE; canvas.height = CANVAS_SIZE;
-  ctx = canvas.getContext('2d');
-  turnTextEl = document.getElementById('turnText');
-  moveCountEl = document.getElementById('moveCount');
-  mainClockEl = document.getElementById('mainClock');
-
-  CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
-    if(w<2*r)r=w/2;if(h<2*r)r=h/2;
-    this.moveTo(x+r,y);this.lineTo(x+w-r,y);this.quadraticCurveTo(x+w,y,x+w,y+r);
-    this.lineTo(x+w,y+h-r);this.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
-    this.lineTo(x+r,y+h);this.quadraticCurveTo(x,y+h,x,y+h-r);
-    this.lineTo(x,y+r);this.quadraticCurveTo(x,y,x+r,y);this.closePath();return this;
-  };
-
+  // init
+  canvas=document.getElementById('boardCanvas');canvas.width=CANVAS_SIZE;canvas.height=CANVAS_SIZE;ctx=canvas.getContext('2d');
+  turnTextEl=document.getElementById('turnText');moveCountEl=document.getElementById('moveCount');mainClockEl=document.getElementById('mainClock');
+  CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){if(w<2*r)r=w/2;if(h<2*r)r=h/2;this.moveTo(x+r,y);this.lineTo(x+w-r,y);this.quadraticCurveTo(x+w,y,x+w,y+r);this.lineTo(x+w,y+h-r);this.quadraticCurveTo(x+w,y+h,x+w-r,y+h);this.lineTo(x+r,y+h);this.quadraticCurveTo(x,y+h,x,y+h-r);this.lineTo(x,y+r);this.quadraticCurveTo(x,y,x+r,y);this.closePath();return this;};
   document.querySelectorAll('.mode-btn').forEach(b=>b.addEventListener('click',()=>switchMode(b.dataset.mode)));
   document.querySelectorAll('.color-dot').forEach(o=>o.addEventListener('click',()=>setPlayerColor(parseInt(o.dataset.color))));
-  document.getElementById('createRoomBtn').addEventListener('click', createPrivateRoom);
-  document.getElementById('matchmakingBtn').addEventListener('click', ()=>{ joinMatchmaking(); document.getElementById('matchmakingBtn').style.display='none'; });
-  document.getElementById('resetBtn').addEventListener('click', resetGame);
-  document.getElementById('undoBtn').addEventListener('click', undoMove);
-
-  const pathRoomId = window.location.pathname.split('/room/')[1];
-  if (pathRoomId && socket) { gameMode=MODE_ONLINE; updateModeButtons(); socket.emit('joinPrivateRoom',{roomId:pathRoomId}); }
-
-  setupEvents(); updateUI(); drawBoard();
-  console.log('🎮 五子棋已启动');
+  document.getElementById('createRoomBtn').addEventListener('click',createPrivateRoom);
+  document.getElementById('matchmakingBtn').addEventListener('click',()=>{joinMatchmaking();document.getElementById('matchmakingBtn').style.display='none';});
+  document.getElementById('resetBtn').addEventListener('click',resetGame);
+  document.getElementById('undoBtn').addEventListener('click',undoMove);
+  const pathRoomId=window.location.pathname.split('/room/')[1];
+  if(pathRoomId&&socket){gameMode=MODE_ONLINE;updateModeButtons();socket.emit('joinPrivateRoom',{roomId:pathRoomId});}
+  setupEvents();updateUI();drawBoard();console.log('🎮 Gomoku ready');
 });
 </script>
 </body>

@@ -99,9 +99,9 @@
     <div class="player-card"><div class="player-avatar white-av"></div><div><div class="player-name" id="whiteName">⚪ 白方</div><div class="player-rating" id="whiteInfo">后手</div></div></div>
   </div>
   <div class="mode-row">
-    <button class="mode-btn active" data-mode="pvp" id="modePvp">👥 本地双人</button>
-    <button class="mode-btn" data-mode="ai" id="modeAi">🤖 AI对战</button>
-    <button class="mode-btn" data-mode="online" id="modeOnline">🌐 在线联机</button>
+<button class="mode-btn mode-switch active" data-mode="pvp" id="modePvp">👥 本地双人</button>
+<button class="mode-btn mode-switch" data-mode="ai" id="modeAi">🤖 AI对战</button>
+<button class="mode-btn mode-switch" data-mode="online" id="modeOnline">🌐 在线联机</button>
   </div>
   <div class="online-row" id="onlineControls" style="display:none;">
     <button id="createRoomBtn">🏠 创建房间</button>
@@ -643,7 +643,7 @@ function aiMoveEasy(){
     document.getElementById('whiteInfo').textContent=currentPlayer===WHITE&&!winner&&!isDraw?t('thinking'):'';
   }
 
-  function updateModeButtons(){document.querySelectorAll('.mode-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===gameMode));document.getElementById('onlineControls').style.display=gameMode===MODE_ONLINE?'flex':'none';document.getElementById('aiSettings').style.display=gameMode===MODE_AI?'flex':'none';}
+  function updateModeButtons(){document.querySelectorAll('.mode-switch').forEach(b=>b.classList.toggle('active',b.dataset.mode===gameMode));...document.getElementById('onlineControls').style.display=gameMode===MODE_ONLINE?'flex':'none';document.getElementById('aiSettings').style.display=gameMode===MODE_AI?'flex':'none';}
 
   function drawBoard(){
     if(!ctx)return;ctx.clearRect(0,0,CANVAS_SIZE,CANVAS_SIZE);
@@ -667,7 +667,7 @@ function aiMoveEasy(){
   canvas=document.getElementById('boardCanvas');canvas.width=CANVAS_SIZE;canvas.height=CANVAS_SIZE;ctx=canvas.getContext('2d');
   turnTextEl=document.getElementById('turnText');moveCountEl=document.getElementById('moveCount');mainClockEl=document.getElementById('mainClock');
   CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){if(w<2*r)r=w/2;if(h<2*r)r=h/2;this.moveTo(x+r,y);this.lineTo(x+w-r,y);this.quadraticCurveTo(x+w,y,x+w,y+r);this.lineTo(x+w,y+h-r);this.quadraticCurveTo(x+w,y+h,x+w-r,y+h);this.lineTo(x+r,y+h);this.quadraticCurveTo(x,y+h,x,y+h-r);this.lineTo(x,y+r);this.quadraticCurveTo(x,y,x+r,y);this.closePath();return this;};
-  document.querySelectorAll('.mode-btn').forEach(b=>b.addEventListener('click',()=>switchMode(b.dataset.mode)));
+  document.querySelectorAll('.mode-switch').forEach(b=>b.addEventListener('click',()=>switchMode(b.dataset.mode)));
   document.querySelectorAll('.color-dot').forEach(o=>o.addEventListener('click',()=>setPlayerColor(parseInt(o.dataset.color))));
 document.querySelectorAll('.ai-diff').forEach(b=>b.addEventListener('click',function(){
   aiDifficulty=this.dataset.diff;

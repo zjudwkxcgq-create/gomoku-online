@@ -58,7 +58,6 @@
     .auth-card h3 { color: #8B6914; margin-bottom: 12px; font-size: 0.95rem; }
     .auth-card input { width: 100%; padding: 9px; margin: 4px 0; border-radius: 6px; border: 1px solid #d0c8b8; background: #faf7f0; font-size: 0.85rem; }
     .auth-card button { width: 100%; padding: 9px; margin-top: 8px; background: #8B6914; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
-    /* 修复截图中的蓝色高亮问题 */
     ::selection { background: #e8d5a3; color: #333; }
     .color-pick-row { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: #999; justify-content: center; }
     .color-dot { width: 20px; height: 20px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
@@ -82,8 +81,9 @@
     </ul>
   </div>
   <div class="nav-right" id="navRight">
-    <button class="user-btn" onclick="showAuth()" id="btnLoginNav">登录</button>
-    <button class="user-btn primary" onclick="showAuth()" id="btnRegNav">注册</button>
+    <!-- 修改点：点击按钮时带上 'login' 和 'register' 参数 -->
+    <button class="user-btn" onclick="showAuth('login')" id="btnLoginNav">登录</button>
+    <button class="user-btn primary" onclick="showAuth('register')" id="btnRegNav">注册</button>
   </div>
   <div class="nav-right" id="navRightLogged" style="display:none;">
     <span style="font-size:0.8rem;color:#666;margin-right:6px;" id="navUserName"></span>
@@ -121,17 +121,16 @@
 <div class="auth-overlay" id="authOverlay" style="display:none;">
   <div class="auth-card">
     <div id="auth-forms">
-      <!-- 【修改点1】删除了顶部切换的 .auth-tabs 按钮区域 -->
+      <!-- 修改点：去掉了顶部切换的 .auth-tabs 按钮区域 -->
       
-      <div id="login-form" style="display:none;">
+      <div id="login-form">
         <h3 id="loginTitleH3">登录</h3>
         <input type="text" id="login-username" placeholder="用户名或邮箱">
         <input type="password" id="login-password" placeholder="密码">
         <button onclick="handleLogin()" id="btnLogin">登录</button>
       </div>
       
-      <!-- 【修改点2】默认展示注册表单 -->
-      <div id="register-form">
+      <div id="register-form" style="display:none;">
         <h3 id="regTitleH3">注册</h3>
         <input type="text" id="reg-username" placeholder="用户名">
         <input type="email" id="reg-email" placeholder="邮箱">
@@ -256,9 +255,22 @@ function updateAllTexts() {
 updateAllTexts();
 
 // ========== 用户系统 ==========
-function showAuth() { document.getElementById('authOverlay').style.display = 'flex'; }
+function showAuth(tab) {
+  document.getElementById('authOverlay').style.display = 'flex';
+  if (tab) switchAuthTab(tab);
+}
+
 function hideAuth() { document.getElementById('authOverlay').style.display = 'none'; }
-/* 【修改点3】删除了原来的 switchAuthTab 函数，因为上面没有切换按钮了 */
+
+function switchAuthTab(tab) {
+  if (tab === 'login') {
+    document.getElementById('login-form').style.display = 'block';
+    document.getElementById('register-form').style.display = 'none';
+  } else {
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('register-form').style.display = 'block';
+  }
+}
 
 window.addEventListener('DOMContentLoaded', function() {
   var token = localStorage.getItem('token');

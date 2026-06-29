@@ -58,9 +58,8 @@
     .auth-card h3 { color: #8B6914; margin-bottom: 12px; font-size: 0.95rem; }
     .auth-card input { width: 100%; padding: 9px; margin: 4px 0; border-radius: 6px; border: 1px solid #d0c8b8; background: #faf7f0; font-size: 0.85rem; }
     .auth-card button { width: 100%; padding: 9px; margin-top: 8px; background: #8B6914; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
-    .auth-tabs { display: flex; gap: 4px; margin-bottom: 10px; }
-    .auth-tab { flex: 1; padding: 6px; background: #f5f0e8; border: 1px solid #d0c8b8; border-radius: 6px; color: #888; cursor: pointer; font-size: 0.75rem; text-align: center; }
-    .auth-tab.active { background: #8B6914; color: #fff; border-color: #8B6914; }
+    /* 修复截图中的蓝色高亮问题 */
+    ::selection { background: #e8d5a3; color: #333; }
     .color-pick-row { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: #999; justify-content: center; }
     .color-dot { width: 20px; height: 20px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
     .color-dot.black-dot { background: radial-gradient(circle at 35% 35%, #555, #111); }
@@ -84,7 +83,7 @@
   </div>
   <div class="nav-right" id="navRight">
     <button class="user-btn" onclick="showAuth()" id="btnLoginNav">登录</button>
-    <button class="user-btn primary" onclick="showAuth(); switchAuthTab('register')" id="btnRegNav">注册</button>
+    <button class="user-btn primary" onclick="showAuth()" id="btnRegNav">注册</button>
   </div>
   <div class="nav-right" id="navRightLogged" style="display:none;">
     <span style="font-size:0.8rem;color:#666;margin-right:6px;" id="navUserName"></span>
@@ -122,17 +121,17 @@
 <div class="auth-overlay" id="authOverlay" style="display:none;">
   <div class="auth-card">
     <div id="auth-forms">
-      <div class="auth-tabs">
-        <button class="auth-tab active" onclick="switchAuthTab('login')" id="tabLogin">登录</button>
-        <button class="auth-tab" onclick="switchAuthTab('register')" id="tabRegister">注册</button>
-      </div>
-      <div id="login-form">
+      <!-- 【修改点1】删除了顶部切换的 .auth-tabs 按钮区域 -->
+      
+      <div id="login-form" style="display:none;">
         <h3 id="loginTitleH3">登录</h3>
         <input type="text" id="login-username" placeholder="用户名或邮箱">
         <input type="password" id="login-password" placeholder="密码">
         <button onclick="handleLogin()" id="btnLogin">登录</button>
       </div>
-      <div id="register-form" style="display:none;">
+      
+      <!-- 【修改点2】默认展示注册表单 -->
+      <div id="register-form">
         <h3 id="regTitleH3">注册</h3>
         <input type="text" id="reg-username" placeholder="用户名">
         <input type="email" id="reg-email" placeholder="邮箱">
@@ -239,7 +238,7 @@ function updateAllTexts() {
     createRoomBtn: 'createRoom', matchmakingBtn: 'quickMatch', chooseColor: 'chooseColor',
     roomIdLabel: 'roomId', roomCopied: 'copied', resetBtn: 'newGame', undoBtn: 'undo',
     blackName: 'black', whiteName: 'white', blackInfo: 'firstHand', whiteInfo: 'secondHand',
-    tabLogin: 'login', tabRegister: 'register', loginTitleH3: 'loginTitle', regTitleH3: 'registerTitle',
+    loginTitleH3: 'loginTitle', regTitleH3: 'registerTitle',
     btnLogin: 'login', btnRegister: 'register', btnClose: 'close',
   };
   for (var id in ids) {
@@ -259,18 +258,7 @@ updateAllTexts();
 // ========== 用户系统 ==========
 function showAuth() { document.getElementById('authOverlay').style.display = 'flex'; }
 function hideAuth() { document.getElementById('authOverlay').style.display = 'none'; }
-function switchAuthTab(tab) {
-  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-  if (tab === 'login') {
-    document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
-    document.getElementById('login-form').style.display = 'block';
-    document.getElementById('register-form').style.display = 'none';
-  } else {
-    document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
-    document.getElementById('login-form').style.display = 'none';
-    document.getElementById('register-form').style.display = 'block';
-  }
-}
+/* 【修改点3】删除了原来的 switchAuthTab 函数，因为上面没有切换按钮了 */
 
 window.addEventListener('DOMContentLoaded', function() {
   var token = localStorage.getItem('token');
